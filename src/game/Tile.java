@@ -33,22 +33,12 @@ public class Tile {
         Polygon polygon = new Polygon();
         double w = Math.sqrt(3) * radius;
         double h = 2 * radius;
-
-        //if((location.y % 4) == 0){
-            polygon.addPoint((int)(coordinates.x - 0.5*w),(int)(coordinates.y + 0.25*h));
-            polygon.addPoint( (int)(coordinates.x),(int)(coordinates.y + 0.5*h));
-            polygon.addPoint((int)(coordinates.x + 0.5*w),(int)(coordinates.y + 0.25*h));
-            polygon.addPoint((int)(coordinates.x + 0.5*w),(int)(coordinates.y - 0.25*h));
-            polygon.addPoint( (int)(coordinates.x),(int)(coordinates.y - 0.5*h));
-            polygon.addPoint((int)(coordinates.x - 0.5*w),(int)(coordinates.y - 0.25*h));
-        //}else{
-        //    polygon.addPoint((int)(coordinates.x - 0.5*w),(int)(coordinates.y + 0.25*h));
-        //    polygon.addPoint( (int)(coordinates.x),(int)(coordinates.y + 0.5*h));
-        //    polygon.addPoint((int)(coordinates.x + 0.5*w),(int)(coordinates.y + 0.25*h));
-        //    polygon.addPoint((int)(coordinates.x + 0.5*w),(int)(coordinates.y - 0.25*h));
-        //    polygon.addPoint( (int)(coordinates.x),(int)(coordinates.y - 0.5*h));
-        //    polygon.addPoint((int)(coordinates.x - 0.5*w),(int)(coordinates.y - 0.25*h));
-        //}
+        polygon.addPoint((int)(coordinates.x - 0.5*w),(int)(coordinates.y + 0.25*h));
+        polygon.addPoint( (int)(coordinates.x),(int)(coordinates.y + 0.5*h));
+        polygon.addPoint((int)(coordinates.x + 0.5*w),(int)(coordinates.y + 0.25*h));
+        polygon.addPoint((int)(coordinates.x + 0.5*w),(int)(coordinates.y - 0.25*h));
+        polygon.addPoint( (int)(coordinates.x),(int)(coordinates.y - 0.5*h));
+        polygon.addPoint((int)(coordinates.x - 0.5*w),(int)(coordinates.y - 0.25*h));
 
         return polygon;
     }
