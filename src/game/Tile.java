@@ -1,6 +1,8 @@
 package game;
 
 import java.awt.*;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Rectangle2D;
 
 public class Tile {
     public final int x;
@@ -42,6 +44,20 @@ public class Tile {
 
         return polygon;
     }
+
+    //private Ellipse2D createStone(){
+     //   Ellipse2D circle = new Ellipse2D.Double();
+        //if(stone == 1){
+        //    //Player 1 thus red
+            
+
+        //}
+        //else if(stone == -1){
+            //Player 2 thus black
+        //}
+
+       // return Null;
+    //}
 
     private Point locationToCoordinates(){
         Point coordinates = new Point(0,0);
