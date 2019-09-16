@@ -4,15 +4,15 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.PreparedStatement;
 
-public class guiController implements ActionListener {
+public class guiController implements ActionListener{
     public static boolean RIGHT_TO_LEFT = false;
 
     private static JButton onePlayerButton;
     private static JButton twoPlayerButton;
     private static JButton undoMoveButton;
     private static Board board;
+
 
     private AI ai;
 
@@ -65,7 +65,7 @@ public class guiController implements ActionListener {
                 System.out.println("no option");
             }
         }
-        if(e.getSource() == undoMoveButton){
+         if(e.getSource() == undoMoveButton) {
             System.out.println("Undo move");
         }
     }
@@ -78,15 +78,11 @@ public class guiController implements ActionListener {
         //Create a new board
         board = new Board();
 
-        //Create a new AI
-        ai = new AI();
-
         //Set up the content pane.
         addComponentsToPane(frame.getContentPane());
 
         //Display the window.
         frame.pack();
         frame.setVisible(true);
-
     }
 }
