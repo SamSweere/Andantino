@@ -2,7 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c0ba9a8c-ef6c-47a6-85e7-de882d7f4474" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/src/game/AI.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/game/guiController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/game/menuBox.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/Application.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/Application.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/chooseGameScreen.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/chooseGameScreen.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/game/Application.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/Application.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/game/chooseGameScreen.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/chooseGameScreen.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
