@@ -13,10 +13,10 @@ public class guiController implements ActionListener{
     private static JButton undoMoveButton;
     private static Board board;
 
+    private Container pane;
 
-    private AI ai;
 
-    public void addComponentsToPane(Container pane) {
+    public void addComponentsToPane() {
 
         if (!(pane.getLayout() instanceof BorderLayout)) {
             pane.add(new JLabel("Container doesn't use BorderLayout!"));
@@ -47,12 +47,25 @@ public class guiController implements ActionListener{
         pane.add(board, BorderLayout.CENTER);
     }
 
+    private void resetBoard(){
+        BorderLayout layout = (BorderLayout)pane.getLayout();
+        pane.remove(layout.getLayoutComponent(BorderLayout.CENTER));
+
+        board = new Board();
+        pane.add(board, BorderLayout.CENTER);
+        board.revalidate();
+        board.repaint();
+    }
+
+
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == onePlayerButton) {
             int confirmed = JOptionPane.showConfirmDialog(null, "Are you sure you want to start a new Player vs AI game?", "New Player vs AI game", JOptionPane.YES_NO_OPTION);
             if (confirmed == JOptionPane.YES_OPTION) {
                 System.out.println("yes option");
+                resetBoard();
             } else {
                 System.out.println("no option");
             }
@@ -61,6 +74,7 @@ public class guiController implements ActionListener{
             int confirmed = JOptionPane.showConfirmDialog(null, "Are you sure you want to start a new two Player game?", "New two Player game", JOptionPane.YES_NO_OPTION);
             if (confirmed == JOptionPane.YES_OPTION) {
                 System.out.println("yes option");
+                resetBoard();
             } else {
                 System.out.println("no option");
             }
@@ -79,7 +93,8 @@ public class guiController implements ActionListener{
         board = new Board();
 
         //Set up the content pane.
-        addComponentsToPane(frame.getContentPane());
+        pane = frame.getContentPane();
+        addComponentsToPane();
 
         //Display the window.
         frame.pack();

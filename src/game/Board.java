@@ -9,6 +9,8 @@ public class Board extends JPanel implements MouseListener {
     private static int radius = 20;
     private static int boardRadius = 9;
 
+    private int playerTurn = 1;
+
     private Tile[][] tiles = new Tile[boardRadius*2+1][boardRadius*2+1];
 
     public Board(){
@@ -36,13 +38,6 @@ public class Board extends JPanel implements MouseListener {
         drawHexGrid(g);
     }
 
-    public void initHexGrid(){
-        Dimension size = getSize();
-        int w = (int) size.getWidth();
-        int h = (int) size.getHeight();
-
-
-    }
 
     public void drawHexGrid(Graphics g) {
         //super.repaint();
@@ -58,15 +53,35 @@ public class Board extends JPanel implements MouseListener {
         g2d.setRenderingHints(rh);
 
         g2d.setStroke(new BasicStroke(2));
-        g2d.setColor(Color.gray);
 
+
+        //Bit of a cheat but it works, first draw the grid
         for(int q = 0; q < boardRadius*2+1; q++){
             for(int r = 0; r < boardRadius*2+1; r++){
                 if(r + q >= boardRadius&& r + q <= 3*boardRadius){
-                    //System.out.println(tiles[q][r].q);
+                    System.out.println();
                     Polygon hexagon = polygonTile(q,r);
+                    g2d.setColor(Color.gray);
                     g2d.draw(hexagon);
-                    //g2d.draw(calcDrawTile(tiles[q][r].q, tiles[q][r].r));
+                }
+            }
+        }
+
+        //Now draw the tiles, this fixes the borders being drawn over the tiles
+        for(int q = 0; q < boardRadius*2+1; q++){
+            for(int r = 0; r < boardRadius*2+1; r++){
+                if(r + q >= boardRadius&& r + q <= 3*boardRadius){
+                    System.out.println();
+                    Polygon hexagon = polygonTile(q,r);
+                    if(tiles[q][r].state == 1){
+                        g2d.setColor(Color.white);
+                        g2d.fillPolygon(hexagon);
+                        g2d.draw(hexagon);
+                    }else if(tiles[q][r].state == 2){
+                        g2d.setColor(Color.black);
+                        g2d.fillPolygon(hexagon);
+                        g2d.draw(hexagon);
+                    }
                 }
             }
         }
@@ -122,7 +137,22 @@ public class Board extends JPanel implements MouseListener {
 
     @Override
     public void mouseReleased(MouseEvent mouseEvent) {
-        System.out.println(mouseEvent.getX() +" "+ mouseEvent.getY());
+        for(int q = 0; q < boardRadius*2+1; q++){
+            for(int r = 0; r < boardRadius*2+1; r++){
+                if(r + q >= boardRadius&& r + q <= 3*boardRadius){
+                    if(polygonTile(q,r).contains(mouseEvent.getX(),mouseEvent.getY())){
+                        System.out.println("Tile: " + q + " " + r);
+                        tiles[q][r].state = playerTurn;
+                        if(playerTurn == 1){
+                            playerTurn = 2;
+                        }else{
+                            playerTurn = 1;
+                        }
+                        this.repaint();
+                    }
+                }
+            }
+        }
     }
 
     @Override
