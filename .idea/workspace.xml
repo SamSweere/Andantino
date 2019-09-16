@@ -2,12 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c0ba9a8c-ef6c-47a6-85e7-de882d7f4474" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/game/chooseGameScreen.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/Application.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/Application.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/Tile.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/Tile.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/game/Application.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/Application.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/game/Tile.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/Tile.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/game/chooseGameScreen.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/chooseGameScreen.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -80,6 +76,14 @@
       <option name="presentableId" value="Default" />
       <updated>1567692853610</updated>
     </task>
+    <task id="LOCAL-00001" summary="trying to make a login screen">
+      <created>1568411443075</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1568411443075</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -94,6 +98,10 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="trying to make a login screen" />
+    <option name="LAST_COMMIT_MESSAGE" value="trying to make a login screen" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
