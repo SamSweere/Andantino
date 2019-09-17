@@ -1,8 +1,8 @@
 package game;
 
 public class Tile {
-    public static int q;
-    public static int r;
+    public int q;
+    public int r;
     public int state;
 
     public Tile(int q, int r, int state){

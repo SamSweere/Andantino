@@ -3,17 +3,24 @@ package game;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
 import javax.swing.JPanel;
+import javax.swing.event.ChangeListener;
 
 public class Board extends JPanel implements MouseListener {
     private static int radius = 20;
-    private static int boardRadius = 9;
+    private static int boardRadius = 3;
 
     private int playerTurn = 1;
 
     private Tile[][] tiles = new Tile[boardRadius*2+1][boardRadius*2+1];
 
+    private ArrayList<Tile> moveHistory = new ArrayList<>();
+
     public Board(){
+        Color backgroundColor = new Color(249,189,59);
+        setBackground(backgroundColor);
+
         initTiles();
         this.addMouseListener(this);
     }
@@ -61,7 +68,7 @@ public class Board extends JPanel implements MouseListener {
                 if(r + q >= boardRadius&& r + q <= 3*boardRadius){
                     System.out.println();
                     Polygon hexagon = polygonTile(q,r);
-                    g2d.setColor(Color.gray);
+                    g2d.setColor(Color.GRAY);
                     g2d.draw(hexagon);
                 }
             }
@@ -123,6 +130,100 @@ public class Board extends JPanel implements MouseListener {
         return polygon;
     }
 
+    public void undoLastMove(){
+        System.out.println("here");
+        System.out.println(moveHistory.size() );
+
+        if(moveHistory.size() > 0){
+            Tile lastTile = moveHistory.get(moveHistory.size() - 1);
+            System.out.println(lastTile.q + " " + lastTile.r);
+            //reset the last played state back to 0
+            tiles[lastTile.q][lastTile.r].state = 0; //new Tile(lastTile.q, lastTile.r, 0);
+
+            //remove the last move
+            moveHistory.remove(moveHistory.size() -1);
+
+            //repaint the board
+            this.repaint();
+        }
+    }
+
+    private boolean checkValidMove(int clickQ, int clickR){
+        int playedNeighbors = 0;
+        //Check all the tiles around the tile
+        System.out.println(clickQ + " " + clickR);
+
+        for(int q = -1; q <= 1; q++){
+            for(int r = -1; r <= 1; r++){
+                int checkQ = clickQ + q;
+                int checkR = clickR + r;
+                if(checkQ + checkR < boardRadius || checkR + checkQ > 3*boardRadius || checkQ < 0 || checkR < 0
+                    || checkQ > boardRadius*2 || checkR > boardRadius*2){
+                    //Off the board, no neighbors
+                }
+                else if(Math.abs(q + r) > 1){
+                    //Not a neighbor
+                }
+                else{
+                    System.out.println(checkQ + " " + checkR);
+                    if(tiles[checkQ][checkR].state != 0){
+                        //Something is played here
+                        playedNeighbors++;
+                    }
+                }
+            }
+        }
+
+        if(moveHistory.size() == 0){
+            //this is the first move, 1 neighbor is allowed
+            if(playedNeighbors >= 1){
+                return true;
+            }
+        }
+        else if(playedNeighbors >= 2){
+            //It is a valid move
+            return true;
+        }
+        //Otherwise it is an invalid move
+        return false;
+
+    }
+
+    private void playerClicked(MouseEvent mouseEvent){
+        for(int q = 0; q < boardRadius*2+1; q++){
+            for(int r = 0; r < boardRadius*2+1; r++){
+                if(r + q >= boardRadius&& r + q <= 3*boardRadius){
+                    if(polygonTile(q,r).contains(mouseEvent.getX(),mouseEvent.getY())){
+                        System.out.println("Tile: " + q + " " + r);
+
+                        //Check if the move is valid
+                        if(checkValidMove(q,r)){
+                            //Valid move
+                            if(tiles[q][r].state == 0){
+                                //state is free
+                                tiles[q][r].state = playerTurn;
+
+                                //add the move to the history
+                                moveHistory.add(tiles[q][r]);
+
+                                if(playerTurn == 1){
+                                    playerTurn = 2;
+                                }else{
+                                    playerTurn = 1;
+                                }
+                                this.repaint();
+
+                            }
+                        }else{
+                            System.out.println("Invalid move, do nothing");
+                        }
+                        //This return fixes the problem when the border between two tiles is clicked
+                        return;
+                    }
+                }
+            }
+        }
+    }
 
 
     @Override
@@ -137,22 +238,7 @@ public class Board extends JPanel implements MouseListener {
 
     @Override
     public void mouseReleased(MouseEvent mouseEvent) {
-        for(int q = 0; q < boardRadius*2+1; q++){
-            for(int r = 0; r < boardRadius*2+1; r++){
-                if(r + q >= boardRadius&& r + q <= 3*boardRadius){
-                    if(polygonTile(q,r).contains(mouseEvent.getX(),mouseEvent.getY())){
-                        System.out.println("Tile: " + q + " " + r);
-                        tiles[q][r].state = playerTurn;
-                        if(playerTurn == 1){
-                            playerTurn = 2;
-                        }else{
-                            playerTurn = 1;
-                        }
-                        this.repaint();
-                    }
-                }
-            }
-        }
+        playerClicked(mouseEvent);
     }
 
     @Override

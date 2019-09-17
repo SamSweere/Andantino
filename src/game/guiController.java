@@ -81,6 +81,7 @@ public class guiController implements ActionListener{
         }
          if(e.getSource() == undoMoveButton) {
             System.out.println("Undo move");
+            board.undoLastMove();
         }
     }
 
@@ -94,6 +95,7 @@ public class guiController implements ActionListener{
 
         //Set up the content pane.
         pane = frame.getContentPane();
+
         addComponentsToPane();
 
         //Display the window.
