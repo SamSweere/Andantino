@@ -4,7 +4,7 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.event.ChangeListener;
 
 public class Board extends JPanel implements MouseListener {
@@ -201,7 +201,7 @@ public class Board extends JPanel implements MouseListener {
         //Check q row
         for(int q = -4; q <= 4; q++){
             int checkQ = lastMoveQ + q;
-            int checkR = lastMoveR - q;
+            int checkR = lastMoveR ;
             if(!(checkQ + checkR < boardRadius || checkR + checkQ > 3*boardRadius || checkQ < 0 || checkR < 0
                     || checkQ > boardRadius*2 || checkR > boardRadius*2)){
                 //Not off the board
@@ -223,7 +223,27 @@ public class Board extends JPanel implements MouseListener {
 
         //Check r row
         for(int r = -4; r <= 4; r++){
-            int checkQ = lastMoveQ ;
+            int checkQ = lastMoveQ;
+            int checkR = lastMoveR + r;
+            if(!(checkQ + checkR < boardRadius || checkR + checkQ > 3*boardRadius || checkQ < 0 || checkR < 0
+                    || checkQ > boardRadius*2 || checkR > boardRadius*2)){
+                //Not off the board
+                if(tiles[checkQ][checkR].state == player){
+                    numInRow++;
+                }
+                else{
+                    numInRow = 0;
+                }
+                if(numInRow == 5){
+                    //Win condition met
+                    return true;
+                }
+            }
+        }
+
+        //Check q + r row
+        for(int r = -4; r <= 4; r++){
+            int checkQ = lastMoveQ - r;
             int checkR = lastMoveR + r;
             if(!(checkQ + checkR < boardRadius || checkR + checkQ > 3*boardRadius || checkQ < 0 || checkR < 0
                     || checkQ > boardRadius*2 || checkR > boardRadius*2)){
@@ -283,9 +303,10 @@ public class Board extends JPanel implements MouseListener {
                                 int winningPlayer = checkWin(q,r);
                                 if(winningPlayer == 1){
                                     System.out.println("Player one won!");
+                                    JOptionPane.showMessageDialog(null, "Player 1 won!");
                                 }
                                 else if(winningPlayer == 2){
-                                    System.out.println("Player two won!");
+                                    JOptionPane.showMessageDialog(null, "Player 2 won!");
                                 }
 
                                 this.repaint();

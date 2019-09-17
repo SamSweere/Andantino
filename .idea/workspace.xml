@@ -141,12 +141,12 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/game/Board.java</url>
-          <line>284</line>
+          <line>304</line>
           <option name="timeStamp" value="13" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/game/Board.java</url>
-          <line>287</line>
+          <line>308</line>
           <option name="timeStamp" value="14" />
         </line-breakpoint>
       </breakpoints>
