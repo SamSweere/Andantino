@@ -2,18 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c0ba9a8c-ef6c-47a6-85e7-de882d7f4474" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/out/production/Andantino/game/AI.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/Andantino/game/Application$1.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/Andantino/game/guiController.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/Board.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/Board.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/Tile.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/Tile.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/chooseGameScreen.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/game/Board.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/Board.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/game/Tile.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/Tile.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/game/TileDraw.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/game/guiController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/guiController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/game/menuBox.java" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -114,7 +105,14 @@
       <option name="project" value="LOCAL" />
       <updated>1568677825398</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="valid move checker implemented">
+      <created>1568741303195</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1568741303195</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -135,7 +133,24 @@
     <MESSAGE value="new approach with controller" />
     <MESSAGE value="grid is working again" />
     <MESSAGE value="grid is working plus clicking" />
-    <option name="LAST_COMMIT_MESSAGE" value="grid is working plus clicking" />
+    <MESSAGE value="valid move checker implemented" />
+    <option name="LAST_COMMIT_MESSAGE" value="valid move checker implemented" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/game/Board.java</url>
+          <line>284</line>
+          <option name="timeStamp" value="13" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/game/Board.java</url>
+          <line>287</line>
+          <option name="timeStamp" value="14" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Andantino$Application.ic" NAME="Application Coverage Results" MODIFIED="1568740638606" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
