@@ -10,8 +10,8 @@ import javax.swing.*;
 import javax.swing.event.ChangeListener;
 
 public class Board extends JPanel implements MouseListener {
-    private static int radius = 40;
-    private static int boardRadius = 3;
+    private static int radius = 30;
+    private static int boardRadius = 9;
 
     private int playerTurn = 1;
 
@@ -266,8 +266,13 @@ public class Board extends JPanel implements MouseListener {
         return false;
     }
 
+    //The tilesFF have the visited places marked, it is completely seperate from tiles
     private Tile[][] tilesFF;
 
+    //Local visit: state = 3, global visit state = 2
+    //The reason for the difference is that is speeds up the calculation
+    //If one global visit did not result in a winstate then when visiting a globally visited tile in the
+    //next check will not give a winstate, thus it can be skipped at that moment
     private void setLocalVisitToGlobalVisit(){
         for(int q = 0; q < boardRadius*2+1; q++){
             for(int r = 0; r < boardRadius*2+1; r++){
