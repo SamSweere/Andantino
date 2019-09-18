@@ -4,11 +4,12 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.Stack;
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
 
 public class Board extends JPanel implements MouseListener {
-    private static int radius = 30;
+    private static int radius = 40;
     private static int boardRadius = 3;
 
     private int playerTurn = 1;
@@ -32,7 +33,7 @@ public class Board extends JPanel implements MouseListener {
                     tiles[q][r] = new Tile(q,r, 0);
                     if(q == boardRadius && r == boardRadius){
                         //starting tile
-                        tiles[q][r].state = 2;
+                        tiles[q][r].state = -1;
                     }
                 }
             }
@@ -70,7 +71,7 @@ public class Board extends JPanel implements MouseListener {
                         g2d.setColor(Color.white);
                         g2d.fillPolygon(hexagon);
                         g2d.draw(hexagon);
-                    }else if(tiles[q][r].state == 2){
+                    }else if(tiles[q][r].state == -1){
                         g2d.setColor(Color.black);
                         g2d.fillPolygon(hexagon);
                         g2d.draw(hexagon);
@@ -128,7 +129,7 @@ public class Board extends JPanel implements MouseListener {
     }
 
     public void undoLastMove(){
-        System.out.println(moveHistory.size() );
+        //System.out.println(moveHistory.size() );
 
         if(moveHistory.size() > 0){
             Tile lastTile = moveHistory.get(moveHistory.size() - 1);
@@ -140,11 +141,7 @@ public class Board extends JPanel implements MouseListener {
             moveHistory.remove(moveHistory.size() -1);
 
             //switch which player's move it is
-            if(playerTurn == 1){
-                playerTurn = 2;
-            }else {
-                playerTurn = 1;
-            }
+            playerTurn = playerTurn*-1;
 
             //repaint the board
             this.repaint();
@@ -241,6 +238,9 @@ public class Board extends JPanel implements MouseListener {
             }
         }
 
+        //Reset counter
+        numInRow = 0;
+
         //Check q + r row
         for(int r = -4; r <= 4; r++){
             int checkQ = lastMoveQ - r;
@@ -265,6 +265,66 @@ public class Board extends JPanel implements MouseListener {
         return false;
     }
 
+    private boolean floodFill(Tile startingPoint, int player){
+        Stack st = new Stack();
+        st.add(startingPoint);
+
+        boolean encounteredOtherPlayer = false;
+
+        while(!st.empty()){
+            Tile tile = (Tile)st.pop();
+            //For every neighbor
+            for(int q = -1; q <= 1; q++){
+                for(int r = -1; r <= 1; r++){
+                    if(q != r){
+                        //this goes through all the neighbors
+                        //if(st.search(new Tile(tile.q + q, tile.r +r, 0)) == -1 || st.search(new Tile(tile.q + q, tile.r +r, 0)) == -1)
+                    }
+                }
+            }
+        }
+
+        if(encounteredOtherPlayer){
+            return true;
+        }
+        return false;
+    }
+
+    private boolean checkWinEnclose(int lastMoveQ, int lastMoveR) {
+        //We use a flood-fill to detect this, the flood-fill starts at an emtpy or at an opponent tile
+        //surrounding the new placed tile. If the flood-fill hits a wall it is impossible that it is encapsulated
+        //thus stop and return false
+        int player = tiles[lastMoveQ][lastMoveR].state;
+
+        //Point[] axialDirections =  {new Point(1,0), new Point(1,-1),new Point(0,-1),
+       //         new Point(-1,0),new Point(-1,+1),new Point(0,+1)};
+
+        Stack startingPoints = new Stack();
+
+        //For every neighbor
+        for(int q = -1; q <= 1; q++){
+            for(int r = -1; r <= 1; r++){
+                if(q != r){
+                    //this goes through all the neighbors
+                    if(tiles[q][r].state != player){
+                        startingPoints.add(tiles[q][r]);
+                    }
+                }
+            }
+        }
+
+        while(!startingPoints.empty()){
+            if(floodFill((Tile)startingPoints.pop(), player)){
+                //win condition met
+                return true;
+            }
+        }
+
+        //No win condition met
+        return false;
+    }
+
+
     private int checkWin(int lastMoveQ, int lastMoveR){
         //Check win rows
         if(checkWinRows(lastMoveQ,lastMoveR)){
@@ -272,8 +332,13 @@ public class Board extends JPanel implements MouseListener {
             return tiles[lastMoveQ][lastMoveR].state;
         }
 
+        //Check win enclode
+        //if(checkWinEnclose(lastMoveQ,lastMoveR)){
+            //win condition met, return player number
+            //return tiles[lastMoveQ][lastMoveR].state;
+        //}
 
-
+        //No win conditions met, thus nobody won
         return 0;
     }
 
@@ -288,29 +353,24 @@ public class Board extends JPanel implements MouseListener {
                         if(checkValidMove(q,r)){
                             //Valid move
                             if(tiles[q][r].state == 0){
-                                //state is free
+                                //state is free, we can draw it
+                                this.repaint();
+
                                 tiles[q][r].state = playerTurn;
 
                                 //add the move to the history
                                 moveHistory.add(tiles[q][r]);
 
-                                if(playerTurn == 1){
-                                    playerTurn = 2;
-                                }else{
-                                    playerTurn = 1;
-                                }
+                                playerTurn = playerTurn*-1;
 
                                 int winningPlayer = checkWin(q,r);
                                 if(winningPlayer == 1){
                                     System.out.println("Player one won!");
                                     JOptionPane.showMessageDialog(null, "Player 1 won!");
                                 }
-                                else if(winningPlayer == 2){
+                                else if(winningPlayer == -1){
                                     JOptionPane.showMessageDialog(null, "Player 2 won!");
                                 }
-
-                                this.repaint();
-
                             }
                         }else{
                             System.out.println("Invalid move, do nothing");
