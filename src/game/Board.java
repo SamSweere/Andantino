@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Stack;
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
@@ -265,6 +266,20 @@ public class Board extends JPanel implements MouseListener {
         return false;
     }
 
+    private Tile[][] tilesFF;
+
+    private void setLocalVisitToGlobalVisit(){
+        for(int q = 0; q < boardRadius*2+1; q++){
+            for(int r = 0; r < boardRadius*2+1; r++){
+                if(r + q >= boardRadius&& r + q <= 3*boardRadius) {
+                    if(tilesFF[q][r].state == 3){
+                        tilesFF[q][r].state = 2;
+                    }
+                }
+            }
+        }
+    }
+
     private boolean floodFill(Tile startingPoint, int player){
         Stack st = new Stack();
         st.add(startingPoint);
@@ -273,12 +288,46 @@ public class Board extends JPanel implements MouseListener {
 
         while(!st.empty()){
             Tile tile = (Tile)st.pop();
+
+            //Set tile as localy visited
+            tilesFF[tile.q][tile.r].state = 3;
+
+            //This needs to be done such that we dont encapsulate an empty area
+            if(tile.state == player*-1){
+                encounteredOtherPlayer = true;
+            }
+
             //For every neighbor
             for(int q = -1; q <= 1; q++){
                 for(int r = -1; r <= 1; r++){
                     if(q != r){
-                        //this goes through all the neighbors
-                        //if(st.search(new Tile(tile.q + q, tile.r +r, 0)) == -1 || st.search(new Tile(tile.q + q, tile.r +r, 0)) == -1)
+                        int checkQ = tile.q + q;
+                        int checkR = tile.r + r;
+                        if(checkQ + checkR < boardRadius || checkR + checkQ > 3*boardRadius || checkQ < 0 || checkR < 0
+                                || checkQ > boardRadius*2 || checkR > boardRadius*2){
+                            //Search out of bounds, thus not enclosed
+                            //Set all the locally visited tiles to globally visited tiles
+                            setLocalVisitToGlobalVisit();
+
+                            return false;
+                        }else if(tilesFF[checkQ][checkR].state == 2){
+                            //Already visited in previous runs, thus no encaptulation
+                            //Set all the locally visited tiles to globally visited tiles
+                            setLocalVisitToGlobalVisit();
+                            return false;
+                        }
+                        else if(tilesFF[checkQ][checkR].state == player){
+                            //Tile of player
+                            continue;
+                        }
+                        else if(tilesFF[checkQ][checkR].state == 3){
+                            //Tile already visited
+                            continue;
+                        }
+                        else{
+                           //add tile to the stack
+                            st.add(tilesFF[checkQ][checkR]);
+                        }
                     }
                 }
             }
@@ -287,6 +336,10 @@ public class Board extends JPanel implements MouseListener {
         if(encounteredOtherPlayer){
             return true;
         }
+        //It encapsulates, but there is no tile of the other player inside
+        //Set all the locally visited tiles to globally visited tiles
+
+        setLocalVisitToGlobalVisit();
         return false;
     }
 
@@ -299,22 +352,42 @@ public class Board extends JPanel implements MouseListener {
         //Point[] axialDirections =  {new Point(1,0), new Point(1,-1),new Point(0,-1),
        //         new Point(-1,0),new Point(-1,+1),new Point(0,+1)};
 
+        //Copy the tiles such that we can mark where we have been
+        //2d clone doesnt work so loop through it
+        tilesFF = new Tile[boardRadius*2+1][boardRadius*2+1];
+        for(int q = 0; q < boardRadius*2+1; q++){
+            for(int r = 0; r < boardRadius*2+1; r++){
+                if(r + q >= boardRadius&& r + q <= 3*boardRadius) {
+                    tilesFF[q][r] = new Tile(tiles[q][r].q, tiles[q][r].r, tiles[q][r].state);
+                }
+            }
+        }
+
         Stack startingPoints = new Stack();
 
         //For every neighbor
         for(int q = -1; q <= 1; q++){
             for(int r = -1; r <= 1; r++){
                 if(q != r){
-                    //this goes through all the neighbors
-                    if(tiles[q][r].state != player){
-                        startingPoints.add(tiles[q][r]);
+                    int checkQ = lastMoveQ + q;
+                    int checkR = lastMoveR + r;
+                    if(!(checkQ + checkR < boardRadius || checkR + checkQ > 3*boardRadius || checkQ < 0 || checkR < 0
+                            || checkQ > boardRadius*2 || checkR > boardRadius*2)) {
+                        //This is a valid tile
+                        if (tiles[checkQ][checkR].state != player) {
+                            startingPoints.add(tiles[checkQ][checkR]);
+                        }
                     }
                 }
             }
         }
 
         while(!startingPoints.empty()){
-            if(floodFill((Tile)startingPoints.pop(), player)){
+            Tile startingPoint = (Tile)startingPoints.pop();
+            if(tilesFF[startingPoint.q][startingPoint.r].state == 2){
+                //tile already visited, no use checking
+            }
+            else if(floodFill(startingPoint, player)){
                 //win condition met
                 return true;
             }
@@ -333,10 +406,10 @@ public class Board extends JPanel implements MouseListener {
         }
 
         //Check win enclode
-        //if(checkWinEnclose(lastMoveQ,lastMoveR)){
+        if(checkWinEnclose(lastMoveQ,lastMoveR)){
             //win condition met, return player number
-            //return tiles[lastMoveQ][lastMoveR].state;
-        //}
+            return tiles[lastMoveQ][lastMoveR].state;
+        }
 
         //No win conditions met, thus nobody won
         return 0;
