@@ -10,20 +10,25 @@ import javax.swing.*;
 import javax.swing.event.ChangeListener;
 
 public class Board extends JPanel implements MouseListener {
-    private static int radius = 30;
-    private static int boardRadius = 9;
+    private static int radius = 25;
+    private static int boardRadius = 3;
 
     private int playerTurn = 1;
 
     private Tile[][] tiles = new Tile[boardRadius*2+1][boardRadius*2+1];
 
-    private ArrayList<Tile> moveHistory = new ArrayList<>();
+    //The reason I save every board for the history is the instant lose positions, these got overwritten when only
+    //saving the moves when undoing and keep playing
+    private ArrayList<Tile[][]> moveHistory = new ArrayList<>();
 
     public Board(){
         Color backgroundColor = new Color(249,189,59);
         setBackground(backgroundColor);
 
         initTiles();
+        //Add the first board to the history
+        addToHistory();
+
         this.addMouseListener(this);
     }
 
@@ -132,14 +137,28 @@ public class Board extends JPanel implements MouseListener {
     public void undoLastMove(){
         //System.out.println(moveHistory.size() );
 
-        if(moveHistory.size() > 0){
-            Tile lastTile = moveHistory.get(moveHistory.size() - 1);
+        if(moveHistory.size() > 1){
+            //Remove the last move
+            moveHistory.remove(moveHistory.size() -1);
+
+            //Get the second to last move
+            Tile[][] localTiles = moveHistory.get(moveHistory.size() - 1);
+
+
+            for(int q = 0; q < boardRadius*2+1; q++){
+                for(int r = 0; r < boardRadius*2+1; r++){
+                    if(r + q >= boardRadius&& r + q <= 3*boardRadius) {
+                        tiles[q][r].state = localTiles[q][r].state;
+                    }
+                }
+            }
+            //Tile[][] lastTile = moveHistory.get(moveHistory.size() - 1);
             //System.out.println(lastTile.q + " " + lastTile.r);
             //reset the last played state back to 0
-            tiles[lastTile.q][lastTile.r].state = 0; //new Tile(lastTile.q, lastTile.r, 0);
+            //tiles[lastTile.q][lastTile.r].state = 0; //new Tile(lastTile.q, lastTile.r, 0);
 
             //remove the last move
-            moveHistory.remove(moveHistory.size() -1);
+            //moveHistory.remove(moveHistory.size() -1);
 
             //switch which player's move it is
             playerTurn = playerTurn*-1;
@@ -149,10 +168,25 @@ public class Board extends JPanel implements MouseListener {
         }
     }
 
+    private void addToHistory(){
+        Tile[][] tilesCopy = new Tile[boardRadius*2+1][boardRadius*2+1];
+
+        //Really impractical that you cant copy an array easily
+        for(int q = 0; q < boardRadius*2+1; q++){
+            for(int r = 0; r < boardRadius*2+1; r++){
+                if(r + q >= boardRadius&& r + q <= 3*boardRadius) {
+                    tilesCopy[q][r] = new Tile(q,r,tiles[q][r].state);
+                }
+            }
+        }
+
+        moveHistory.add(tilesCopy);
+    }
+
     private boolean checkValidMove(int clickQ, int clickR){
         int playedNeighbors = 0;
         //Check if tile not already taken
-        if(tiles[clickQ][clickR].state != 0){
+        if(tiles[clickQ][clickR].state != 0 && tiles[clickQ][clickR].state != -2 && tiles[clickQ][clickR].state != 2){
             return false;
         }
 
@@ -177,7 +211,7 @@ public class Board extends JPanel implements MouseListener {
             }
         }
 
-        if(moveHistory.size() == 0){
+        if(moveHistory.size() == 1){
             //this is the first move, 1 neighbor is allowed
             if(playedNeighbors >= 1){
                 return true;
@@ -192,9 +226,9 @@ public class Board extends JPanel implements MouseListener {
 
     }
 
-    private boolean checkWinRows(int lastMoveQ, int lastMoveR){
+    private boolean checkWinRows(int lastMoveQ, int lastMoveR, int player){
 
-        int player = tiles[lastMoveQ][lastMoveR].state;
+        //int player = tiles[lastMoveQ][lastMoveR].state;
         int numInRow = 0;
         //Check q row
         for(int q = -4; q <= 4; q++){
@@ -203,7 +237,11 @@ public class Board extends JPanel implements MouseListener {
             if(!(checkQ + checkR < boardRadius || checkR + checkQ > 3*boardRadius || checkQ < 0 || checkR < 0
                     || checkQ > boardRadius*2 || checkR > boardRadius*2)){
                 //Not off the board
-                if(tiles[checkQ][checkR].state == player){
+                if(q == 0){
+                    //Own location, this is thus a player
+                    numInRow++;
+                }
+                else if(tiles[checkQ][checkR].state == player){
                     numInRow++;
                 }
                 else{
@@ -226,7 +264,11 @@ public class Board extends JPanel implements MouseListener {
             if(!(checkQ + checkR < boardRadius || checkR + checkQ > 3*boardRadius || checkQ < 0 || checkR < 0
                     || checkQ > boardRadius*2 || checkR > boardRadius*2)){
                 //Not off the board
-                if(tiles[checkQ][checkR].state == player){
+                if(r == 0){
+                    //Own location, this is thus a player
+                    numInRow++;
+                }
+                else if(tiles[checkQ][checkR].state == player){
                     numInRow++;
                 }
                 else{
@@ -249,7 +291,11 @@ public class Board extends JPanel implements MouseListener {
             if(!(checkQ + checkR < boardRadius || checkR + checkQ > 3*boardRadius || checkQ < 0 || checkR < 0
                     || checkQ > boardRadius*2 || checkR > boardRadius*2)){
                 //Not off the board
-                if(tiles[checkQ][checkR].state == player){
+                if(r == 0){
+                    //Own location, this is thus a player
+                    numInRow++;
+                }
+                else if(tiles[checkQ][checkR].state == player){
                     numInRow++;
                 }
                 else{
@@ -269,16 +315,30 @@ public class Board extends JPanel implements MouseListener {
     //The tilesFF have the visited places marked, it is completely seperate from tiles
     private Tile[][] tilesFF;
 
-    //Local visit: state = 3, global visit state = 2
+    //Local visit: state = 4, global visit state = 3
     //The reason for the difference is that is speeds up the calculation
     //If one global visit did not result in a winstate then when visiting a globally visited tile in the
     //next check will not give a winstate, thus it can be skipped at that moment
-    private void setLocalVisitToGlobalVisit(){
+    private void setLocalVisitToGlobalVisit(int state){
         for(int q = 0; q < boardRadius*2+1; q++){
             for(int r = 0; r < boardRadius*2+1; r++){
                 if(r + q >= boardRadius&& r + q <= 3*boardRadius) {
-                    if(tilesFF[q][r].state == 3){
-                        tilesFF[q][r].state = 2;
+                    if(tilesFF[q][r].state == 4){
+                        tilesFF[q][r].state = state;
+                    }
+                }
+            }
+        }
+    }
+
+    private void setGlobalLossStates(int state){
+        for(int q = 0; q < boardRadius*2+1; q++){
+            for(int r = 0; r < boardRadius*2+1; r++){
+                if(r + q >= boardRadius&& r + q <= 3*boardRadius) {
+                    //Check in the local tiles field and change is the global
+                    //The reason for this is that loss states are permanent to the game
+                    if(tilesFF[q][r].state == 4){
+                        tiles[q][r].state = state;
                     }
                 }
             }
@@ -294,13 +354,13 @@ public class Board extends JPanel implements MouseListener {
         while(!st.empty()){
             Tile tile = (Tile)st.pop();
 
-            //Set tile as localy visited
-            tilesFF[tile.q][tile.r].state = 3;
-
             //This needs to be done such that we dont encapsulate an empty area
             if(tile.state == player*-1){
                 encounteredOtherPlayer = true;
             }
+
+            //Set tile as localy visited
+            tilesFF[tile.q][tile.r].state = 4;
 
             //For every neighbor
             for(int q = -1; q <= 1; q++){
@@ -312,20 +372,19 @@ public class Board extends JPanel implements MouseListener {
                                 || checkQ > boardRadius*2 || checkR > boardRadius*2){
                             //Search out of bounds, thus not enclosed
                             //Set all the locally visited tiles to globally visited tiles
-                            setLocalVisitToGlobalVisit();
-
+                            setLocalVisitToGlobalVisit(3);
                             return false;
-                        }else if(tilesFF[checkQ][checkR].state == 2){
+                        }else if(tilesFF[checkQ][checkR].state == 3){
                             //Already visited in previous runs, thus no encaptulation
                             //Set all the locally visited tiles to globally visited tiles
-                            setLocalVisitToGlobalVisit();
+                            setLocalVisitToGlobalVisit(3);
                             return false;
                         }
                         else if(tilesFF[checkQ][checkR].state == player){
                             //Tile of player
                             continue;
                         }
-                        else if(tilesFF[checkQ][checkR].state == 3){
+                        else if(tilesFF[checkQ][checkR].state == 4){
                             //Tile already visited
                             continue;
                         }
@@ -342,17 +401,17 @@ public class Board extends JPanel implements MouseListener {
             return true;
         }
         //It encapsulates, but there is no tile of the other player inside
-        //Set all the locally visited tiles to globally visited tiles
+        //Set all the locally visited tiles to loss tiles for the other team
+        setGlobalLossStates(player*2);
 
-        setLocalVisitToGlobalVisit();
         return false;
     }
 
-    private boolean checkWinEnclose(int lastMoveQ, int lastMoveR) {
+    private boolean checkWinEnclose(int lastMoveQ, int lastMoveR, int player) {
         //We use a flood-fill to detect this, the flood-fill starts at an emtpy or at an opponent tile
         //surrounding the new placed tile. If the flood-fill hits a wall it is impossible that it is encapsulated
         //thus stop and return false
-        int player = tiles[lastMoveQ][lastMoveR].state;
+        //int player = tiles[lastMoveQ][lastMoveR].state;
 
         //Point[] axialDirections =  {new Point(1,0), new Point(1,-1),new Point(0,-1),
        //         new Point(-1,0),new Point(-1,+1),new Point(0,+1)};
@@ -367,6 +426,10 @@ public class Board extends JPanel implements MouseListener {
                 }
             }
         }
+
+        //Set the state for the dwarn tile in the FF. Since in this case the check already has been done
+        //The reason for this ugly contstruction is that in this way we can keep the check win in one function
+        tilesFF[lastMoveQ][lastMoveR].state = player;
 
         Stack startingPoints = new Stack();
 
@@ -403,17 +466,23 @@ public class Board extends JPanel implements MouseListener {
     }
 
 
-    private int checkWin(int lastMoveQ, int lastMoveR){
+    private int checkWin(int lastMoveQ, int lastMoveR, int player){
+        //Check if the player put a move in a define losing position (previously found by the enclosement algorithm
+        if(tiles[lastMoveQ][lastMoveR].state == playerTurn*-2){
+            //The other player wins because they put their own in an enclosed area
+            return player*-1;
+        }
+
         //Check win rows
-        if(checkWinRows(lastMoveQ,lastMoveR)){
+        if(checkWinRows(lastMoveQ,lastMoveR, player)){
             //win condition met, return player number
-            return tiles[lastMoveQ][lastMoveR].state;
+            return player;
         }
 
         //Check win enclode
-        if(checkWinEnclose(lastMoveQ,lastMoveR)){
+        if(checkWinEnclose(lastMoveQ,lastMoveR, player)){
             //win condition met, return player number
-            return tiles[lastMoveQ][lastMoveR].state;
+            return player;
         }
 
         //No win conditions met, thus nobody won
@@ -430,23 +499,26 @@ public class Board extends JPanel implements MouseListener {
                         //Check if the move is valid
                         if(checkValidMove(q,r)){
                             //Valid move
-                            if(tiles[q][r].state == 0){
-                                //state is free, we can draw it
-                                this.repaint();
+                            if(tiles[q][r].state <= 2 && tiles[q][r].state >= -2 ){
+                                int winningPlayer = checkWin(q,r, playerTurn);
 
                                 tiles[q][r].state = playerTurn;
 
                                 //add the move to the history
-                                moveHistory.add(tiles[q][r]);
+                                addToHistory();
 
                                 playerTurn = playerTurn*-1;
 
-                                int winningPlayer = checkWin(q,r);
+                                //We did all the checks we can now draw it (this makes it more nice visually)
+                                this.repaint();
+
+                                //When the tile is drawn show the possible win message
                                 if(winningPlayer == 1){
                                     System.out.println("Player one won!");
                                     JOptionPane.showMessageDialog(null, "Player 1 won!");
                                 }
                                 else if(winningPlayer == -1){
+                                    System.out.println("Player two won!");
                                     JOptionPane.showMessageDialog(null, "Player 2 won!");
                                 }
                             }
