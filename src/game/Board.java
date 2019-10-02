@@ -10,10 +10,12 @@ import javax.swing.*;
 import javax.swing.event.ChangeListener;
 
 public class Board extends JPanel implements MouseListener {
-    private static int radius = 25;
-    private static int boardRadius = 9;
+    private final int radius = 25;
+    private final int boardRadius = 9;
+    //Game mode 0: AI vs AI, 1: Player vs AI (player is white); 2: AI vs Player (player is black); 3: Player vs player
+    private final int gameMode;
 
-    private int playerTurn = 1;
+    private int playerTurn;
 
     private Tile[][] tiles = new Tile[boardRadius*2+1][boardRadius*2+1];
 
@@ -23,7 +25,24 @@ public class Board extends JPanel implements MouseListener {
     //saving the moves when undoing and keep playing
     private ArrayList<Tile[][]> moveHistory = new ArrayList<>();
 
-    public Board(){
+    public Board(int gameMode){
+        this.gameMode = gameMode;
+        switch (gameMode){
+            case 0:
+                playerTurn = 1;
+                break;
+            case 1:
+                playerTurn = 1;
+                break;
+            case 2:
+                playerTurn = -1;
+                break;
+            case 3:
+                playerTurn = 1;
+                break;
+        }
+
+
         Color backgroundColor = new Color(249,189,59);
         setBackground(backgroundColor);
 
