@@ -2,10 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c0ba9a8c-ef6c-47a6-85e7-de882d7f4474" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/src/game/Game.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/Board.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/Board.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/boardChecker.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/boardChecker.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/guiController.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/guiController.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/game/Board.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/Board.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/game/Tile.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/Tile.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/game/boardChecker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/boardChecker.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/game/guiController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/guiController.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -156,6 +159,23 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/game/Game.java</url>
+          <line>180</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/game/Game.java</url>
+          <line>178</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/game/boardChecker.java</url>
+          <line>109</line>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+      </breakpoints>
       <breakpoints-dialog>
         <breakpoints-dialog>
           <selected-grouping-rules>
@@ -164,14 +184,6 @@
         </breakpoints-dialog>
       </breakpoints-dialog>
     </breakpoint-manager>
-    <watches-manager>
-      <configuration name="Application">
-        <watch expression="tiles[1][3].state" />
-        <watch expression="((game.Tile[][])((Board)this).tiles)[3][1]" custom="game.Tile[][],game.Board" />
-        <watch expression="((Tile[][])((Board)this).tiles)[3][1].state" custom="game.Tile[][],game.Board" />
-        <watch expression="tiles[0][1].state" />
-      </configuration>
-    </watches-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Andantino$Application.ic" NAME="Application Coverage Results" MODIFIED="1568740638606" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">

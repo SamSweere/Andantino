@@ -5,7 +5,7 @@ import java.util.Stack;
 public class boardChecker {
     private final int boardRadius;
     private int playerTurn;
-    private Tile[][] tiles;
+    private Board board;
 
     public boardChecker(int boardRadius){
         this.boardRadius = boardRadius;
@@ -26,7 +26,7 @@ public class boardChecker {
                     //Own location, this is thus a player
                     numInRow++;
                 }
-                else if(tiles[checkQ][checkR].state == player){
+                else if(board.getTileState(checkQ,checkR) == player){
                     numInRow++;
                 }
                 else{
@@ -53,7 +53,7 @@ public class boardChecker {
                     //Own location, this is thus a player
                     numInRow++;
                 }
-                else if(tiles[checkQ][checkR].state == player){
+                else if(board.getTileState(checkQ,checkR) == player){
                     numInRow++;
                 }
                 else{
@@ -80,7 +80,7 @@ public class boardChecker {
                     //Own location, this is thus a player
                     numInRow++;
                 }
-                else if(tiles[checkQ][checkR].state == player){
+                else if(board.getTileState(checkQ,checkR) == player){
                     numInRow++;
                 }
                 else{
@@ -97,40 +97,38 @@ public class boardChecker {
         return false;
     }
 
-    //The tilesFF have the visited places marked, it is completely seperate from tiles
-    private Tile[][] tilesFF;
 
     //Local visit: state = 4, global visit state = 3
     //The reason for the difference is that is speeds up the calculation
     //If one global visit did not result in a winstate then when visiting a globally visited tile in the
     //next check will not give a winstate, thus it can be skipped at that moment
-    private void setLocalVisitToGlobalVisit(int state){
+    private void setLocalVisitToGlobalVisit(int state, Board boardFF){
         for(int q = 0; q < boardRadius*2+1; q++){
             for(int r = 0; r < boardRadius*2+1; r++){
                 if(r + q >= boardRadius&& r + q <= 3*boardRadius) {
-                    if(tilesFF[q][r].state == 4){
-                        tilesFF[q][r].state = state;
+                    if(boardFF.getTileState(q,r) == 4){
+                        boardFF.setTileState(q,r, state);
                     }
                 }
             }
         }
     }
 
-    private void setGlobalLossStates(int state){
+    private void setGlobalLossStates(int state, Board boardFF){
         for(int q = 0; q < boardRadius*2+1; q++){
             for(int r = 0; r < boardRadius*2+1; r++){
                 if(r + q >= boardRadius&& r + q <= 3*boardRadius) {
                     //Check in the local tiles field and change is the global
                     //The reason for this is that loss states are permanent to the game
-                    if(tilesFF[q][r].state == 4){
-                        tiles[q][r].state = state;
+                    if(boardFF.getTileState(q,r) == 4){
+                        board.setTileState(q,r,state);
                     }
                 }
             }
         }
     }
 
-    private boolean floodFill(Tile startingPoint, int player){
+    private boolean floodFill(Tile startingPoint, int player, Board boardFF){
         Stack st = new Stack();
         st.add(startingPoint);
 
@@ -145,7 +143,7 @@ public class boardChecker {
             }
 
             //Set tile as localy visited
-            tilesFF[tile.q][tile.r].state = 4;
+            boardFF.setTileState(tile.q, tile.r, 4);
 
             //For every neighbor
             for(int q = -1; q <= 1; q++){
@@ -157,25 +155,25 @@ public class boardChecker {
                                 || checkQ > boardRadius*2 || checkR > boardRadius*2){
                             //Search out of bounds, thus not enclosed
                             //Set all the locally visited tiles to globally visited tiles
-                            setLocalVisitToGlobalVisit(3);
+                            setLocalVisitToGlobalVisit(3, boardFF);
                             return false;
-                        }else if(tilesFF[checkQ][checkR].state == 3){
+                        }else if(boardFF.getTileState(checkQ,checkR) == 3){
                             //Already visited in previous runs, thus no encaptulation
                             //Set all the locally visited tiles to globally visited tiles
-                            setLocalVisitToGlobalVisit(3);
+                            setLocalVisitToGlobalVisit(3, boardFF);
                             return false;
                         }
-                        else if(tilesFF[checkQ][checkR].state == player){
+                        else if(boardFF.getTileState(checkQ,checkR) == player){
                             //Tile of player
                             continue;
                         }
-                        else if(tilesFF[checkQ][checkR].state == 4){
+                        else if(boardFF.getTileState(checkQ,checkR) == 4){
                             //Tile already visited
                             continue;
                         }
                         else{
                             //add tile to the stack
-                            st.add(tilesFF[checkQ][checkR]);
+                            st.add(boardFF.getTile(checkQ,checkR));
                         }
                     }
                 }
@@ -187,7 +185,7 @@ public class boardChecker {
         }
         //It encapsulates, but there is no tile of the other player inside
         //Set all the locally visited tiles to loss tiles for the other team
-        setGlobalLossStates(player*2);
+        setGlobalLossStates(player*2, boardFF);
 
         return false;
     }
@@ -201,20 +199,13 @@ public class boardChecker {
         //Point[] axialDirections =  {new Point(1,0), new Point(1,-1),new Point(0,-1),
         //         new Point(-1,0),new Point(-1,+1),new Point(0,+1)};
 
-        //Copy the tiles such that we can mark where we have been
-        //2d clone doesnt work so loop through it
-        tilesFF = new Tile[boardRadius*2+1][boardRadius*2+1];
-        for(int q = 0; q < boardRadius*2+1; q++){
-            for(int r = 0; r < boardRadius*2+1; r++){
-                if(r + q >= boardRadius&& r + q <= 3*boardRadius) {
-                    tilesFF[q][r] = new Tile(tiles[q][r].q, tiles[q][r].r, tiles[q][r].state);
-                }
-            }
-        }
+        //Copy the board such that we can mark where we have been
+        Board boardFF = new Board(board);
+
 
         //Set the state for the dwarn tile in the FF. Since in this case the check already has been done
         //The reason for this ugly contstruction is that in this way we can keep the check win in one function
-        tilesFF[lastMoveQ][lastMoveR].state = player;
+        boardFF.setTileState(lastMoveQ, lastMoveR, player);
 
         Stack startingPoints = new Stack();
 
@@ -227,8 +218,9 @@ public class boardChecker {
                     if(!(checkQ + checkR < boardRadius || checkR + checkQ > 3*boardRadius || checkQ < 0 || checkR < 0
                             || checkQ > boardRadius*2 || checkR > boardRadius*2)) {
                         //This is a valid tile
-                        if (tiles[checkQ][checkR].state != player) {
-                            startingPoints.add(tiles[checkQ][checkR]);
+                        if (board.getTileState(checkQ,checkR) != player) {
+                            //startingPoints.add(tiles[checkQ][checkR]);
+                            startingPoints.add(board.getTile(checkQ,checkR));
                         }
                     }
                 }
@@ -237,10 +229,10 @@ public class boardChecker {
 
         while(!startingPoints.empty()){
             Tile startingPoint = (Tile)startingPoints.pop();
-            if(tilesFF[startingPoint.q][startingPoint.r].state == 2){
+            if(boardFF.getTileState(startingPoint.q,startingPoint.r) == 2){
                 //tile already visited, no use checking
             }
-            else if(floodFill(startingPoint, player)){
+            else if(floodFill(startingPoint, player, boardFF)){
                 //win condition met
                 return true;
             }
@@ -251,11 +243,11 @@ public class boardChecker {
     }
 
 
-    public int checkWin(int lastMoveQ, int lastMoveR, int player, Tile[][] tiles){
+    public int checkWin(int lastMoveQ, int lastMoveR, int player, Board board){
         this.playerTurn = player;
-        this.tiles = tiles;
+        this.board = board;
         //Check if the player put a move in a define losing position (previously found by the enclosement algorithm
-        if(tiles[lastMoveQ][lastMoveR].state == playerTurn*-2){
+        if(board.getTileState(lastMoveQ,lastMoveR) == playerTurn*-2){
             //The other player wins because they put their own in an enclosed area
             return player*-1;
         }
@@ -277,8 +269,8 @@ public class boardChecker {
     }
 
 
-    public boolean checkValidMove(int clickQ, int clickR, Tile[][] tiles, int moveNumber){
-        this.tiles = tiles;
+    public boolean checkValidMove(int clickQ, int clickR, Board board, int moveNumber){
+        this.board = board;
         //Check if the location is on the board
         if(clickQ + clickR < boardRadius || clickQ + clickR > 3*boardRadius || clickQ < 0 || clickR < 0
                 || clickQ > boardRadius*2 || clickR > boardRadius*2){
@@ -288,7 +280,7 @@ public class boardChecker {
 
         int playedNeighbors = 0;
         //Check if tile not already taken
-        if(tiles[clickQ][clickR].state != 0 && tiles[clickQ][clickR].state != -2 && tiles[clickQ][clickR].state != 2){
+        if(board.getTileState(clickQ,clickR) != 0 && board.getTileState(clickQ,clickR) != -2 && board.getTileState(clickQ,clickR) != 2){
             return false;
         }
 
@@ -305,7 +297,7 @@ public class boardChecker {
                     //Not a neighbor
                 }
                 else{
-                    if(tiles[checkQ][checkR].state != 0){
+                    if(board.getTileState(checkQ,checkR) != 0){
                         //Something is played here
                         playedNeighbors++;
                     }

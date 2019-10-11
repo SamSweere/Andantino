@@ -12,7 +12,7 @@ public class guiController implements ActionListener{
     private static JButton onePlayerButton;
     private static JButton twoPlayerButton;
     private static JButton undoMoveButton;
-    private static Board board;
+    private static Game board;
 
     private Container pane;
 
@@ -56,7 +56,7 @@ public class guiController implements ActionListener{
         BorderLayout layout = (BorderLayout)pane.getLayout();
         pane.remove(layout.getLayoutComponent(BorderLayout.CENTER));
 
-        board = new Board(gameMode);
+        board = new Game(gameMode);
         pane.add(board, BorderLayout.CENTER);
         board.revalidate();
         board.repaint();
@@ -114,7 +114,7 @@ public class guiController implements ActionListener{
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         //Create a new board
-        board = new Board(3);
+        board = new Game(3);
 
         //Set up the content pane.
         pane = frame.getContentPane();
