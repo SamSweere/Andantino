@@ -93,6 +93,11 @@ public class Game extends JPanel implements MouseListener {
                         g2d.fillPolygon(hexagon);
                         g2d.draw(hexagon);
                     }
+                    else if(board.tileIsPlayable(q,r)){
+                        g2d.setColor(new Color(179, 134, 44));
+                        g2d.fillPolygon(hexagon);
+                        g2d.draw(hexagon);
+                    }
                 }
             }
         }

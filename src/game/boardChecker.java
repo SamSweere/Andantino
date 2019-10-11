@@ -107,7 +107,7 @@ public class boardChecker {
             for(int r = 0; r < boardRadius*2+1; r++){
                 if(r + q >= boardRadius&& r + q <= 3*boardRadius) {
                     if(boardFF.getTileState(q,r) == 4){
-                        boardFF.setTileState(q,r, state);
+                        boardFF.setTileStateFF(q,r, state);
                     }
                 }
             }
@@ -143,7 +143,7 @@ public class boardChecker {
             }
 
             //Set tile as localy visited
-            boardFF.setTileState(tile.q, tile.r, 4);
+            boardFF.setTileStateFF(tile.q, tile.r, 4);
 
             //For every neighbor
             for(int q = -1; q <= 1; q++){
@@ -205,7 +205,7 @@ public class boardChecker {
 
         //Set the state for the dwarn tile in the FF. Since in this case the check already has been done
         //The reason for this ugly contstruction is that in this way we can keep the check win in one function
-        boardFF.setTileState(lastMoveQ, lastMoveR, player);
+        boardFF.setTileStateFF(lastMoveQ, lastMoveR, player);
 
         Stack startingPoints = new Stack();
 
@@ -280,7 +280,7 @@ public class boardChecker {
 
         int playedNeighbors = 0;
         //Check if tile not already taken
-        if(board.getTileState(clickQ,clickR) != 0 && board.getTileState(clickQ,clickR) != -2 && board.getTileState(clickQ,clickR) != 2){
+        if(board.getTileState(clickQ,clickR) == -1 || board.getTileState(clickQ,clickR) == 1){
             return false;
         }
 
@@ -297,7 +297,7 @@ public class boardChecker {
                     //Not a neighbor
                 }
                 else{
-                    if(board.getTileState(checkQ,checkR) != 0){
+                    if(board.getTileState(checkQ,checkR) == -1 || board.getTileState(checkQ,checkR) == 1){
                         //Something is played here
                         playedNeighbors++;
                     }
