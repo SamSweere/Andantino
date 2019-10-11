@@ -1,5 +1,7 @@
 package game;
 
+import java.util.ArrayList;
+
 public class Board {
     private final int boardRadius;
     private Tile[][] tiles;
@@ -19,7 +21,7 @@ public class Board {
         for(int q = 0; q < boardRadius*2+1; q++){
             for(int r = 0; r < boardRadius*2+1; r++){
                 if(r + q >= boardRadius&& r + q <= 3*boardRadius){
-                    tiles[q][r] = new Tile(q,r, 0);
+                    tiles[q][r] = new Tile(q,r, 0, false);
                     if(q == boardRadius && r == boardRadius){
                         //starting tile
                         tiles[q][r].state = -1;
@@ -131,7 +133,7 @@ public class Board {
         for(int q = 0; q < boardRadius*2+1; q++){
             for(int r = 0; r < boardRadius*2+1; r++){
                  if(r + q >= boardRadius&& r + q <= 3*boardRadius) {
-                    tilesCopy[q][r] = new Tile(q,r,tiles[q][r].state);
+                    tilesCopy[q][r] = new Tile(q,r,tiles[q][r].state, tiles[q][r].playable);
                  }
              }
         }
@@ -144,5 +146,21 @@ public class Board {
 
     public boolean tileIsPlayable(int q, int r){
         return tiles[q][r].playable;
+    }
+
+    public ArrayList<Tile> getPlayableTiles(){
+
+        ArrayList<Tile> playableTiles = new ArrayList<>();
+
+        for(int q = 0; q < boardRadius*2+1; q++) {
+            for (int r = 0; r < boardRadius * 2 + 1; r++) {
+                if (r + q >= boardRadius && r + q <= 3 * boardRadius) {
+                    if(tiles[q][r].playable){
+                        playableTiles.add(tiles[q][r]);
+                    }
+                }
+            }
+        }
+        return playableTiles;
     }
 }

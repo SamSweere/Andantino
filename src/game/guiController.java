@@ -114,7 +114,7 @@ public class guiController implements ActionListener{
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         //Create a new board
-        board = new Game(3);
+        board = new Game(1);
 
         //Set up the content pane.
         pane = frame.getContentPane();

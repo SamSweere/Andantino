@@ -8,11 +8,17 @@ import javax.swing.*;
 
 public class Game extends JPanel implements MouseListener {
     private final int radius = 25;
-    private final int boardRadius = 3;
+    private final int boardRadius = 9;
     //Game mode 0: AI vs AI, 1: Player vs AI (player is white); 2: AI vs Player (player is black); 3: Player vs player
     private final int gameMode;
 
     private int playerTurn;
+
+    private boolean humanTurn;
+
+    private boolean gameFinished;
+
+    private AI ai;
 
     private Board board;
 
@@ -28,33 +34,69 @@ public class Game extends JPanel implements MouseListener {
         this.board = new Board(boardRadius);
 
         this.gameMode = gameMode;
-        switch (gameMode){
-            case 0:
-                playerTurn = 1;
-                break;
-            case 1:
-                playerTurn = 1;
-                break;
-            case 2:
-                playerTurn = -1;
-                break;
-            case 3:
-                playerTurn = 1;
-                break;
-        }
 
+        //Player one always starts
+        playerTurn = 1;
+
+        //Game is not finished yet
+        gameFinished = false;
 
         Color backgroundColor = new Color(249,189,59);
         setBackground(backgroundColor);
 
         //Add the first board to the history
         addToHistory();
-        //Initialise the winchecker
-
-
         this.addMouseListener(this);
+
+        //Start the game
+        switch (gameMode){
+            case 0:
+                //AI vs Ai game
+                aiVSaiGame();
+                break;
+            case 1:
+                // Player vs AI, player is white
+                ai = new AI(-1);
+                break;
+            case 2:
+                // AI vs Player, player is black
+                ai = new AI(1);
+                playerVSaiGameAIMove();
+                break;
+            case 3:
+                // Player vs player
+                break;
+        }
     }
 
+    private void aiVSaiGame(){
+        AI aiWhite = new AI(1);
+        AI aiBlack = new AI(-1);
+
+        boolean gameFinished = false;
+        //While not won
+        while(!gameFinished){
+            if(playerTurn == 1){
+                aiWhite.updateBoard(board);
+                Tile aiMove = aiWhite.makeMove();
+                gameFinished = makeMove(aiMove.q,aiMove.r);
+            }else{
+                aiBlack.updateBoard(board);
+                Tile aiMove = aiBlack.makeMove();
+                gameFinished = makeMove(aiMove.q,aiMove.r);
+            }
+        }
+    }
+
+    private void playerVSaiGameAIMove(){
+        //Update the ai board
+        ai.updateBoard(board);
+
+        Tile aiMoveTile = ai.makeMove();
+
+        //Make the move on the board
+        gameFinished = makeMove(aiMoveTile.q,aiMoveTile.r);
+    }
 
 
     @Override
@@ -94,7 +136,7 @@ public class Game extends JPanel implements MouseListener {
                         g2d.draw(hexagon);
                     }
                     else if(board.tileIsPlayable(q,r)){
-                        g2d.setColor(new Color(179, 134, 44));
+                        g2d.setColor(new Color(203, 153, 48));
                         g2d.fillPolygon(hexagon);
                         g2d.draw(hexagon);
                     }
@@ -172,6 +214,36 @@ public class Game extends JPanel implements MouseListener {
         boardHistory.add(new Board(board));
     }
 
+    private boolean makeMove(int q, int r){
+        int winningPlayer = boardCheck.checkWin(q,r, playerTurn, board);
+
+        board.setTileState(q,r,playerTurn);
+
+        //add the move to the history
+        addToHistory();
+
+        //Change the player turn
+        playerTurn = playerTurn*-1;
+
+        //We did all the checks we can now draw it (this makes it more nice visually)
+        this.repaint();
+
+        //When the tile is drawn show the possible win message
+        if(winningPlayer == 1){
+            System.out.println("Player one won!");
+            JOptionPane.showMessageDialog(null, "Player 1 won!");
+            //Game is finished
+            return true;
+        }
+        else if(winningPlayer == -1){
+            System.out.println("Player two won!");
+            JOptionPane.showMessageDialog(null, "Player 2 won!");
+            //Game is finished
+            return true;
+        }
+        return false;
+    }
+
     private void playerClicked(MouseEvent mouseEvent){
         for(int q = 0; q < boardRadius*2+1; q++){
             for(int r = 0; r < boardRadius*2+1; r++){
@@ -181,32 +253,16 @@ public class Game extends JPanel implements MouseListener {
 
                         //Check if the move is valid
                         if(boardCheck.checkValidMove(q,r, board, boardHistory.size())){
-                            int winningPlayer = boardCheck.checkWin(q,r, playerTurn, board);
-
-                            board.setTileState(q,r,playerTurn);
-
-                            //add the move to the history
-                            addToHistory();
-
-                            //Change the player turn
-                            playerTurn = playerTurn*-1;
-
-                            //We did all the checks we can now draw it (this makes it more nice visually)
-                            this.repaint();
-
-                            //When the tile is drawn show the possible win message
-                            if(winningPlayer == 1){
-                                System.out.println("Player one won!");
-                                JOptionPane.showMessageDialog(null, "Player 1 won!");
-                            }
-                            else if(winningPlayer == -1){
-                                System.out.println("Player two won!");
-                                JOptionPane.showMessageDialog(null, "Player 2 won!");
+                            gameFinished = makeMove(q,r);
+                            //Let a possible AI know it is his turn
+                            if(gameMode == 1 || gameMode == 2){
+                                //Let the AI move
+                                playerVSaiGameAIMove();
                             }
                         }else{
                             System.out.println("Invalid move, do nothing");
                         }
-                        //This return fixes the problem when the border between two tiles is clicked
+                        //The return here fixes the problem when the border between two tiles is clicked
                         return;
                     }
                 }

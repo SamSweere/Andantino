@@ -9,10 +9,10 @@ public class Tile {
     public int state;
     public Boolean playable;
 
-    public Tile(int q, int r, int state){
+    public Tile(int q, int r, int state, boolean playable){
         this.q  = q;
         this.r = r;
         this.state = state;
-        this.playable = false;
+        this.playable = playable;
     }
 }
