@@ -5,9 +5,11 @@ import java.util.ArrayList;
 public class Board {
     private final int boardRadius;
     private Tile[][] tiles;
+    private int playerTurn;
 
-    public Board(int boardRadius){
+    public Board(int boardRadius, int playerTurn){
         this.boardRadius = boardRadius;
+        this.playerTurn = playerTurn;
         this.tiles = new Tile[boardRadius*2+1][boardRadius*2+1];
         initialBoard();
     }
@@ -15,6 +17,7 @@ public class Board {
     public Board(Board board){
         this.boardRadius = board.getBoardRadius();
         this.tiles = board.getTiles();
+        this.playerTurn = board.getPlayerTurn();
     }
 
     public void initialBoard(){
@@ -118,6 +121,9 @@ public class Board {
 
     public void setTileState(int q, int r, int state){
         tiles[q][r].state = state;
+        //Upate the player turn
+        playerTurn = -1*playerTurn;
+
         //Check for new possible places to put the next tile
         markPlayableTiles();
     }
@@ -142,6 +148,10 @@ public class Board {
 
     public  int getBoardRadius(){
         return boardRadius;
+    }
+
+    public int getPlayerTurn(){
+        return playerTurn;
     }
 
     public boolean tileIsPlayable(int q, int r){

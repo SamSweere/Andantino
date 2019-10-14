@@ -243,7 +243,8 @@ public class boardChecker {
     }
 
 
-    public int checkWin(int lastMoveQ, int lastMoveR, int player, Board board){
+    public int checkWin(int lastMoveQ, int lastMoveR, Board board){
+        int player = board.getPlayerTurn();
         this.playerTurn = player;
         this.board = board;
         //Check if the player put a move in a define losing position (previously found by the enclosement algorithm

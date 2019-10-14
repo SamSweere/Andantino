@@ -12,8 +12,6 @@ public class Game extends JPanel implements MouseListener {
     //Game mode 0: AI vs AI, 1: Player vs AI (player is white); 2: AI vs Player (player is black); 3: Player vs player
     private final int gameMode;
 
-    private int playerTurn;
-
     private boolean humanTurn;
 
     private boolean gameFinished;
@@ -31,12 +29,12 @@ public class Game extends JPanel implements MouseListener {
     private ArrayList<Board> boardHistory = new ArrayList<>();
 
     public Game(int gameMode){
-        this.board = new Board(boardRadius);
-
         this.gameMode = gameMode;
 
         //Player one always starts
-        playerTurn = 1;
+        int playerTurn = 1;
+
+        this.board = new Board(boardRadius, playerTurn);
 
         //Game is not finished yet
         gameFinished = false;
@@ -76,7 +74,7 @@ public class Game extends JPanel implements MouseListener {
         boolean gameFinished = false;
         //While not won
         while(!gameFinished){
-            if(playerTurn == 1){
+            if(board.getPlayerTurn() == 1){
                 aiWhite.updateBoard(board);
                 Tile aiMove = aiWhite.makeMove();
                 gameFinished = makeMove(aiMove.q,aiMove.r);
@@ -194,20 +192,60 @@ public class Game extends JPanel implements MouseListener {
 
     public void undoLastMove(){
         //System.out.println(moveHistory.size() );
-
-        if(boardHistory.size() > 1){
-            //Remove the last move
-            boardHistory.remove(boardHistory.size() -1);
-
-            //Get the second to last move
-            board = new Board(boardHistory.get(boardHistory.size() - 1));
-
-            //switch which player's move it is
-            playerTurn = playerTurn*-1;
-
-            //repaint the board
-            this.repaint();
+        //This funtion goes back to the last player move, we have to jump over the ai moves
+        //This function is disabled when playing AI vs AI (the game is deterministic anyways)
+        if(gameMode == 0){
+            return;
         }
+
+        if(gameMode == 1 || gameMode == 2){
+            int playerNum;
+            if(gameMode == 1){
+                //Player is white
+                playerNum = 1;
+            }
+            else{
+                //Player is black
+                playerNum = -1;
+            }
+            //At least one move had to be made
+
+            if (boardHistory.size() > 1) {
+                //If the last move was of the player (remember, AI is at turn then)
+                if(boardHistory.get(boardHistory.size()-1).getPlayerTurn() == -1*playerNum){
+                    //Remove the last move
+                    boardHistory.remove(boardHistory.size() - 1);
+
+                    //Get the now last move
+                    board = new Board(boardHistory.get(boardHistory.size() - 1));
+                }
+                else{
+                    //In this case the last move was of the AI, we need to get two move back
+                    //Check if two move is possible
+                    if(boardHistory.size() > 2){
+                        //Remove the last two moves
+                        boardHistory.remove(boardHistory.size() - 1);
+                        boardHistory.remove(boardHistory.size() - 1);
+
+                        //Get the now last move
+                        board = new Board(boardHistory.get(boardHistory.size() - 1));
+                    }
+                }
+
+            }
+        }
+        else if(gameMode == 3) {
+            if (boardHistory.size() > 1) {
+                //Remove the last move
+                boardHistory.remove(boardHistory.size() - 1);
+
+                //Get the second to last move
+                board = new Board(boardHistory.get(boardHistory.size() - 1));
+            }
+        }
+
+        //repaint the board
+        this.repaint();
     }
 
     private void addToHistory(){
@@ -215,15 +253,15 @@ public class Game extends JPanel implements MouseListener {
     }
 
     private boolean makeMove(int q, int r){
-        int winningPlayer = boardCheck.checkWin(q,r, playerTurn, board);
+        int winningPlayer = boardCheck.checkWin(q,r, board);
 
-        board.setTileState(q,r,playerTurn);
+        board.setTileState(q,r,board.getPlayerTurn());
 
         //add the move to the history
         addToHistory();
 
         //Change the player turn
-        playerTurn = playerTurn*-1;
+        //playerTurn = playerTurn*-1;
 
         //We did all the checks we can now draw it (this makes it more nice visually)
         this.repaint();
