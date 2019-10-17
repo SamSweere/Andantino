@@ -75,12 +75,12 @@ public class Game extends JPanel implements MouseListener {
         //While not won
         while(!gameFinished){
             if(board.getPlayerTurn() == 1){
-                aiWhite.updateBoard(board);
-                Tile aiMove = aiWhite.makeMove();
+                //aiWhite.updateBoard(board);
+                Tile aiMove = aiWhite.makeMove(board);
                 gameFinished = makeMove(aiMove.q,aiMove.r);
             }else{
-                aiBlack.updateBoard(board);
-                Tile aiMove = aiBlack.makeMove();
+                //aiBlack.updateBoard(board);
+                Tile aiMove = aiBlack.makeMove(board);
                 gameFinished = makeMove(aiMove.q,aiMove.r);
             }
         }
@@ -88,9 +88,9 @@ public class Game extends JPanel implements MouseListener {
 
     private void playerVSaiGameAIMove(){
         //Update the ai board
-        ai.updateBoard(board);
+        //ai.updateBoard(board);
 
-        Tile aiMoveTile = ai.makeMove();
+        Tile aiMoveTile = ai.makeMove(board);
 
         //Make the move on the board
         gameFinished = makeMove(aiMoveTile.q,aiMoveTile.r);
@@ -294,8 +294,10 @@ public class Game extends JPanel implements MouseListener {
                             gameFinished = makeMove(q,r);
                             //Let a possible AI know it is his turn
                             if(gameMode == 1 || gameMode == 2){
-                                //Let the AI move
-                                playerVSaiGameAIMove();
+                                if(!gameFinished){
+                                    //Let the AI move
+                                    playerVSaiGameAIMove();
+                                }
                             }
                         }else{
                             System.out.println("Invalid move, do nothing");

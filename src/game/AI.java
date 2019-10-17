@@ -11,9 +11,9 @@ public class AI {
         this.aiColor = aiColor;
     }
 
-    public void updateBoard(Board board){
-        this.board = board;
-    }
+    //public void updateBoard(Board board){
+    //    this.board = board;
+    //}
 
     private Tile randomMove(){
         ArrayList<Tile> playableTiles = board.getPlayableTiles();
@@ -26,7 +26,9 @@ public class AI {
         return playableTiles.get(randomNum);
     }
 
-    public Tile makeMove(){
+    public Tile makeMove(Board board){
+        this.board = board;
+
         return randomMove();
     }
 }
