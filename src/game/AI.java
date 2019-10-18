@@ -35,6 +35,7 @@ public class AI {
             //TODO: Put the evaluation function here in the future
             //Make more shallow wins more important
             //if (winState == aiColor) {
+            //TODO: I think the opposite of what I want is happening here. Higher value is given to deeper solutions here
             return -1 * (depth+1);
             //} else {
             //    return -1 * (depth+1);
