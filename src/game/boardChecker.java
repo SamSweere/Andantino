@@ -3,13 +3,13 @@ package game;
 import java.util.Stack;
 
 public class boardChecker {
-    private final int boardRadius;
+    private int boardRadius;
     private int playerTurn;
     private Board board;
 
-    public boardChecker(int boardRadius){
-        this.boardRadius = boardRadius;
-    }
+    //public boardChecker(int boardRadius){
+    //    this.boardRadius = boardRadius;
+    //}
 
     private boolean checkWinRows(int lastMoveQ, int lastMoveR, int player){
 
@@ -247,6 +247,7 @@ public class boardChecker {
         int player = board.getPlayerTurn();
         this.playerTurn = player;
         this.board = board;
+        this.boardRadius = board.getBoardRadius();
         //Check if the player put a move in a define losing position (previously found by the enclosement algorithm
         if(board.getTileState(lastMoveQ,lastMoveR) == playerTurn*-2){
             //The other player wins because they put their own in an enclosed area
@@ -259,7 +260,7 @@ public class boardChecker {
             return player;
         }
 
-        //Check win enclode
+        //Check win enclose
         if(checkWinEnclose(lastMoveQ,lastMoveR, player)){
             //win condition met, return player number
             return player;
@@ -272,6 +273,7 @@ public class boardChecker {
 
     public boolean checkValidMove(int clickQ, int clickR, Board board, int moveNumber){
         this.board = board;
+        this.boardRadius = board.getBoardRadius();
         //Check if the location is on the board
         if(clickQ + clickR < boardRadius || clickQ + clickR > 3*boardRadius || clickQ < 0 || clickR < 0
                 || clickQ > boardRadius*2 || clickR > boardRadius*2){

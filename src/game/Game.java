@@ -8,7 +8,7 @@ import javax.swing.*;
 
 public class Game extends JPanel implements MouseListener {
     private final int radius = 25;
-    private final int boardRadius = 9;
+    private final int boardRadius = 4;
     //Game mode 0: AI vs AI, 1: Player vs AI (player is white); 2: AI vs Player (player is black); 3: Player vs player
     private final int gameMode;
 
@@ -22,7 +22,7 @@ public class Game extends JPanel implements MouseListener {
 
     //private Tile[][] tiles = new Tile[boardRadius*2+1][boardRadius*2+1];
 
-    private boardChecker boardCheck = new boardChecker(boardRadius);
+    private final boardChecker boardCheck = new boardChecker();
 
     //The reason I save every board for the history is the instant lose positions, these got overwritten when only
     //saving the moves when undoing and keep playing

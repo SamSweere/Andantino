@@ -120,7 +120,7 @@ public class Board {
     }
 
     public void setTileState(int q, int r, int state){
-        tiles[q][r].state = state;
+        tiles[q][r].state = (byte) state;
         //Upate the player turn
         playerTurn = -1*playerTurn;
 
@@ -130,7 +130,7 @@ public class Board {
 
     public void setTileStateFF(int q, int r, int state){
         //This one is for the flood fill, there you do not want to recheck the possible states
-        tiles[q][r].state = state;
+        tiles[q][r].state = (byte) state;
     }
 
     public Tile[][] getTiles(){
