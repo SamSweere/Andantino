@@ -1,7 +1,6 @@
 package game;
 
 import java.util.ArrayList;
-import java.util.Stack;
 
 //This class is used for the pv and other useful data for a search return
 public class SearchReturn{

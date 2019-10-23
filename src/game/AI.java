@@ -49,7 +49,7 @@ public class AI {
         return randomNum;
     }
 
-    private SearchReturn alphaBeta(Board board, int depth, int alpha, int beta, Move move){
+    private SearchReturn alphaBeta(Board board, int depth, int alpha, int beta, Move move, long hash){
         if(move.q == Integer.MAX_VALUE){
             //this is the start, no need to check winstates
         }else{
