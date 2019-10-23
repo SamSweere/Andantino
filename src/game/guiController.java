@@ -5,7 +5,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class guiController implements ActionListener{
+public class guiController  extends JPanel implements ActionListener {
     public static boolean RIGHT_TO_LEFT = false;
 
     private static JButton AIPlayerButton;
@@ -62,8 +62,6 @@ public class guiController implements ActionListener{
         board.repaint();
     }
 
-
-
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == AIPlayerButton) {
@@ -108,21 +106,12 @@ public class guiController implements ActionListener{
         }
     }
 
-    public guiController(){
-        //Create and set up the window.
-        JFrame frame = new JFrame("Adantino by Sam Sweere");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    public guiController(Container pane){
+        this.pane = pane;
 
         //Create a new board
         board = new Game(1);
 
-        //Set up the content pane.
-        pane = frame.getContentPane();
-
         addComponentsToPane();
-
-        //Display the window.
-        frame.pack();
-        frame.setVisible(true);
     }
 }

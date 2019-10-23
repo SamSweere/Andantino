@@ -1,6 +1,8 @@
 package game;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
@@ -14,7 +16,7 @@ public class Game extends JPanel implements MouseListener {
 
     private boolean humanTurn;
 
-    private boolean gameFinished;
+    private boolean gameFinished = false;
 
     private AI ai;
 
@@ -71,19 +73,29 @@ public class Game extends JPanel implements MouseListener {
         AI aiWhite = new AI(1);
         AI aiBlack = new AI(-1);
 
-        boolean gameFinished = false;
-        //While not won
-        while(!gameFinished){
-            if(board.getPlayerTurn() == 1){
-                //aiWhite.updateBoard(board);
-                Move aiMove = aiWhite.makeMove(board);
-                gameFinished = makeMove(aiMove);
-            }else{
-                //aiBlack.updateBoard(board);
-                Move aiMove  = aiBlack.makeMove(board);
-                gameFinished = makeMove(aiMove);
+
+        //Roughly 30 fps
+        int timerDelay = 33;
+        new Timer(timerDelay, new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                //While not won
+                if(!gameFinished){
+                    if(board.getPlayerTurn() == 1){
+                        //aiWhite.updateBoard(board);
+                        Move aiMove = aiWhite.makeMove(board);
+                        gameFinished = makeMove(aiMove);
+                    }else{
+                        //aiBlack.updateBoard(board);
+                        Move aiMove  = aiBlack.makeMove(board);
+                        gameFinished = makeMove(aiMove);
+                    }
+                }
+                repaint();
             }
-        }
+        }).start();
+
+        //aiBlack.closeFile();
+        //aiWhite.closeFile();
     }
 
     private void playerVSaiGameAIMove(){

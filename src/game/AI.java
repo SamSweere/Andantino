@@ -1,6 +1,8 @@
 package game;
 
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Stack;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -8,9 +10,14 @@ public class AI {
     private Board board;
     private final int aiColor;
     private final boardChecker boardCheck = new boardChecker();
+    private int nodesVisited;
+    private fileWriter fw;
+    private final int totalTime = 60*10;
+    private final int maxTimePerMove = 10;
 
     public AI(int aiColor){
         this.aiColor = aiColor;
+        this.fw = new fileWriter("noPruning" + aiColor);
     }
 
     //public void updateBoard(Board board){
@@ -34,13 +41,16 @@ public class AI {
         // so add 1 to make it inclusive
         int randomNum = ThreadLocalRandom.current().nextInt(-99, 99 + 1);
 
+        //TODO: remove this
+        randomNum = 0;
         return randomNum;
     }
 
-    private SearchReturn AlphaBeta(Board board, int depth, int alpha, int beta, Move move){
+    private SearchReturn alphaBeta(Board board, int depth, int alpha, int beta, Move move){
         if(move.q == Integer.MAX_VALUE){
             //this is the start, no need to check winstates
         }else{
+            nodesVisited += 1;
             int winState = boardCheck.checkWin(move.q, move.r, board);
             //winState = 0 means no win state reached
             if(winState != 0 || depth == 0){
@@ -85,7 +95,7 @@ public class AI {
                 int childMoveR = playableTiles.get(childBoardNum).r;
                 Move childMove = new Move(childMoveQ, childMoveR);
 
-                SearchReturn sr = AlphaBeta(new Board(board), depth -1, alpha, beta, childMove);
+                SearchReturn sr = alphaBeta(new Board(board), depth -1, alpha, beta, childMove);
 
                 //Set the pv initially on the first search return
                 if(sr.value > score){
@@ -107,7 +117,7 @@ public class AI {
                 }
                 if(alpha >= beta){
                     //prune
-                    break;
+                    //break;
                 }
             }
         }
@@ -123,7 +133,7 @@ public class AI {
                 int childMoveR = playableTiles.get(childBoardNum).r;
                 Move childMove = new Move(childMoveQ, childMoveR);
 
-                SearchReturn sr = AlphaBeta(new Board(board), depth - 1, alpha, beta, childMove);
+                SearchReturn sr = alphaBeta(new Board(board), depth - 1, alpha, beta, childMove);
 
                 //Set the pv initially on the first search return
                 if (sr.value < score) {
@@ -132,148 +142,68 @@ public class AI {
 
                     pv.moveUp(childMove);
                 }
-                /**else if(sr.value == score){
-                    //Choose the one with the lowest depth
-                    if(sr.depth < pv.depth){
-                        pv = sr;
-                        pv.moveUp(childMove);
-                    }
-                }**/
                 if (sr.value < beta) {
                     beta = sr.value;
                 }
                 if (alpha >= beta) {
                     //prune
-                    break;
+                    //break;
                 }
             }
         }
         return pv;
     }
 
-    //NegaMax implementation
-    /**private int AlphaBeta(Board board, int depth, int alpha, int beta, int moveQ, int moveR){
-        int winState = boardCheck.checkWin(moveQ, moveR, board);
-        //winState = 0 means no win state reached
-        if(winState != 0){
-            //TODO: Put the evaluation function here in the future
-            //Make more shallow wins more important
-            //In NegaMax the win values are returned with respect to the root player
-            if(board.getPlayerTurn() == aiColor){
-                if(winState == aiColor){
-                    return 1;
-                } else {
-                    return -1;
-                }
-            }else{
-                if(winState != aiColor){
-                    return 1;
-                } else {
-                    return -1;
-                }
-            }
-            //    return -1 * (depth+1);
-            //}
-                //System.out.println("a winstate has been seen: " + winState );
-           // if(winState == 0){
-                //Depth has been reached, do not return 0 since it will rate it better than losing
-            //    return Integer.MIN_VALUE;
+    private void printInformation(SearchReturn pv, float timeLapsed){
+        String aiColorString;
+        String oponentColorString;
+        if(aiColor == 1){
+            aiColorString = "White";
+            oponentColorString = "Black";
+        }else{
+            aiColorString = "Black";
+            oponentColorString = "White";
         }
-        else if(depth == 0){
-            //Max depth reached without win
-            return 0;
+        if(pv.value == 100){
+            //We won for sure
+            System.out.println("AI " + aiColorString + ": we will win in " + (pv.depth - 1) + " moves!!!");
         }
-
-        //No endstate is reached, make the actual move
-        board.setTileState(moveQ,moveR,board.getPlayerTurn());
-
-        //Have to take max value
-        int score = -1*Integer.MAX_VALUE;
-
-        ArrayList<Tile> playableTiles = board.getPlayableTiles();
-
-        for(int childBoardNum = 0; childBoardNum < playableTiles.size(); childBoardNum++){
-            int childMoveQ = playableTiles.get(childBoardNum).q;
-            int childMoveR = playableTiles.get(childBoardNum).r;
-
-            int value = -1 * AlphaBeta(new Board(board), depth -1, -1*beta, -1*alpha, childMoveQ, childMoveR);
-            if(value > score){
-                score = value;
-            }
-            if(score > alpha){
-                alpha = score;
-            }
-            if(score >= beta){
-                //TODO: reimplement pruning
-                break;
-            }
+        if(pv.value == -100){
+            //We lost for sure
+            System.out.println("AI " + aiColorString + ": we will lose in at least " + (pv.depth-1) + " moves!!!");
         }
+        String nodesTime = "Nodes visited: " + nodesVisited + " in " + timeLapsed;
+        System.out.println(nodesTime);
 
-        return score;
+
     }
 
-    private Tile startAlphaBeta(Board board, int depth){
-        //Since my alpha beta implementation needs a move we need a function to start that
-        if(depth == 0){
-            System.out.println("ERROR: initial depth is zero");
-        }
 
-        int score = -1*Integer.MAX_VALUE;
-
-        //TODO: windowing can be done here
-        int alpha = -1*Integer.MAX_VALUE;
-        int beta = Integer.MAX_VALUE;
-
-        ArrayList<Tile> playableTiles = board.getPlayableTiles();
-
-        //Initialize bestMove with the first option
-        Tile bestMove = playableTiles.get(0);
-
-        for(int childBoardNum = 0; childBoardNum < playableTiles.size(); childBoardNum++){
-
-            int childMoveQ = playableTiles.get(childBoardNum).q;
-            int childMoveR = playableTiles.get(childBoardNum).r;
-            int value = -1 * AlphaBeta(new Board(board), depth-1, -1*beta, -1*alpha, childMoveQ, childMoveR);
-            //System.out.println("childNum " + childBoardNum + " gives: " + value);
-            if(value > score){
-                score = value;
-                //New highest
-                bestMove = playableTiles.get(childBoardNum);
-                System.out.println("new best move: " + childBoardNum + " with score: " + score );
-            }
-            if(score > alpha){
-                alpha = score;
-            }
-            if(score >= beta){
-                //TODO: reimplement pruning, it breaks it now
-                break;
-            }
-        }
-        return bestMove;
-    }**/
 
     public Move makeMove(Board board){
         this.board = board;
 
+        nodesVisited = 0;
+
+        Date date = new Date();
+        long start = System.currentTimeMillis();
+
         //return randomMove();
-        int depth = 3;
+        int depth = 5;
 
         int alpha = -1*Integer.MAX_VALUE;
         int beta = Integer.MAX_VALUE;
 
         //For the intial move make a move with max values (impossible to do)
-        SearchReturn pv = AlphaBeta(new Board(board),depth,alpha,beta, new Move(Integer.MAX_VALUE, Integer.MAX_VALUE));
+        SearchReturn pv = alphaBeta(new Board(board),depth,alpha,beta, new Move(Integer.MAX_VALUE, Integer.MAX_VALUE));
         Move move = pv.getLastMove();
 
-        System.out.println(pv.value);
-        if(pv.value == 100){
-            //We won for sure
-            System.out.println("We will win in " + (pv.depth - 1) + " moves!!!");
-        }
-        if(pv.value == -100){
-            //We lost for sure
-            System.out.println("We will lose in at least " + (pv.depth-1) + " moves!!!");
-        }
+        long finish = System.currentTimeMillis();
+        float timeElapsed = ((float)(finish - start))/1000;
+
+        fw.writeLine(depth,timeElapsed,nodesVisited);
+
+        printInformation(pv, timeElapsed);
 
         return move;
     }
