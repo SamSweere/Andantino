@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class AI {
+public class AITest {
     private String aiName = "pruning_randomEval_T8";
     private Board board;
     private final int aiColor;
@@ -15,7 +15,7 @@ public class AI {
     private final int maxTestTime = 60;
     private int totalTestTime = 0;
 
-    public AI(int aiColor){
+    public AITest(int aiColor){
         this.aiColor = aiColor;
         if(aiColor == 1){
             aiName = aiName + "_white";

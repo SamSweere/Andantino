@@ -48,7 +48,6 @@ public class fileWriter {
         String st  = "";
         try {
             st = br.readLine();
-            System.out.println(st);
             while (st != null){
                 currentContents.append(st + "\n");
                 st = br.readLine();
@@ -56,8 +55,6 @@ public class fileWriter {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-
-        System.out.println(currentContents.toString());
 
         //Open new writer
         FileOutputStream fos = null;
