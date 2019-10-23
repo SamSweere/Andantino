@@ -79,7 +79,7 @@ public class guiController implements ActionListener{
             int confirmed = JOptionPane.showConfirmDialog(null, "Are you sure you want to start a new Player vs AI game?", "New Player vs AI game", JOptionPane.YES_NO_OPTION);
             if (confirmed == JOptionPane.YES_OPTION) {
                 String[] buttons = { "White", "Black"};
-                int rc = JOptionPane.showOptionDialog(null, "Start as White or Black?", "Confirmation",
+                int rc = JOptionPane.showOptionDialog(null, "Start as player White or Black?", "Confirmation",
                         JOptionPane.DEFAULT_OPTION, -1, null, buttons, buttons[1]);
                 System.out.println(rc);
                 if(rc == 0){

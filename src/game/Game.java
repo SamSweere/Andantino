@@ -8,7 +8,7 @@ import javax.swing.*;
 
 public class Game extends JPanel implements MouseListener {
     private final int radius = 25;
-    private final int boardRadius = 3;
+    private final int boardRadius = 9;
     //Game mode 0: AI vs AI, 1: Player vs AI (player is white); 2: AI vs Player (player is black); 3: Player vs player
     private final int gameMode;
 
@@ -106,6 +106,7 @@ public class Game extends JPanel implements MouseListener {
 
     public void drawHexGrid(Graphics g) {
         //super.repaint();
+
         Graphics2D g2d = (Graphics2D) g;
 
         RenderingHints rh
@@ -255,7 +256,7 @@ public class Game extends JPanel implements MouseListener {
     private boolean makeMove(Move move){
         int winningPlayer = boardCheck.checkWin(move.q, move.r, board);
 
-        board.setTileState(move.q,move.r,board.getPlayerTurn());
+        board.setTileState(move.q, move.r,board.getPlayerTurn());
 
         //add the move to the history
         addToHistory();
