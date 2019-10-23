@@ -1,6 +1,7 @@
 package game;
 
 import java.util.ArrayList;
+import java.util.Stack;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class AI {
@@ -27,17 +28,77 @@ public class AI {
         return playableTiles.get(randomNum);
     }
 
+    //This class is used for the pv and other useful data for a search return
+    private class SearchReturn{
+        public int value;
+        private Stack pv;
+        public int depth;
+
+        public SearchReturn(Move move){
+            this.pv = new Stack();
+            pv.add(move);
+            this.depth = 0;
+        }
+
+        public void setValue(int value){
+            this.value = value;
+        }
+
+        public void moveUp(Move move){
+            pv.add(move);
+            depth += 1;
+        }
+
+        public Move getLastMove(){
+            return (Move)pv.get(pv.size()-1);
+        }
+    }
+
+    private SearchReturn AlphaBeta(Board board, int depth, int alpha, int beta, Move move){
+        int winState = boardCheck.checkWin(move.q, move.r, board);
+        //winState = 0 means no win state reached
+        if(winState != 0 || depth == 0){
+            //This is a leaf node, make new searchReturn object
+            SearchReturn sr = new SearchReturn(move);
+            if(winState != 0){
+                //TODO: Put the evaluation function here in the future
+                //A win state has been found, this is thus a leafe node.
+                if(winState == aiColor){
+                    sr.setValue(1);
+                } else {
+                    sr.setValue(-1);
+                }
+
+            }
+            else if(depth == 0){
+                //Max depth reached without win
+                sr.setValue(0);
+            }
+            return sr;
+        }
+    }
+
     //NegaMax implementation
-    private int AlphaBeta(Board board, int depth, int alpha, int beta, int moveQ, int moveR){
+    /**private int AlphaBeta(Board board, int depth, int alpha, int beta, int moveQ, int moveR){
         int winState = boardCheck.checkWin(moveQ, moveR, board);
         //winState = 0 means no win state reached
         if(winState != 0){
             //TODO: Put the evaluation function here in the future
             //Make more shallow wins more important
-            //if (winState == aiColor) {
-            //TODO: I think the opposite of what I want is happening here. Higher value is given to deeper solutions here
-            return -1 * (depth+1);
-            //} else {
+            //In NegaMax the win values are returned with respect to the root player
+            if(board.getPlayerTurn() == aiColor){
+                if(winState == aiColor){
+                    return 1;
+                } else {
+                    return -1;
+                }
+            }else{
+                if(winState != aiColor){
+                    return 1;
+                } else {
+                    return -1;
+                }
+            }
             //    return -1 * (depth+1);
             //}
                 //System.out.println("a winstate has been seen: " + winState );
@@ -53,7 +114,8 @@ public class AI {
         //No endstate is reached, make the actual move
         board.setTileState(moveQ,moveR,board.getPlayerTurn());
 
-        int score = Integer.MIN_VALUE;
+        //Have to take max value
+        int score = -1*Integer.MAX_VALUE;
 
         ArrayList<Tile> playableTiles = board.getPlayableTiles();
 
@@ -70,7 +132,7 @@ public class AI {
             }
             if(score >= beta){
                 //TODO: reimplement pruning
-                //break;
+                break;
             }
         }
 
@@ -83,10 +145,10 @@ public class AI {
             System.out.println("ERROR: initial depth is zero");
         }
 
-        int score = Integer.MIN_VALUE;
+        int score = -1*Integer.MAX_VALUE;
 
         //TODO: windowing can be done here
-        int alpha = Integer.MIN_VALUE;
+        int alpha = -1*Integer.MAX_VALUE;
         int beta = Integer.MAX_VALUE;
 
         ArrayList<Tile> playableTiles = board.getPlayableTiles();
@@ -111,17 +173,18 @@ public class AI {
             }
             if(score >= beta){
                 //TODO: reimplement pruning, it breaks it now
-                //break;
+                break;
             }
         }
         return bestMove;
-    }
+    }**/
 
-    public Tile makeMove(Board board){
+    public Move makeMove(Board board){
         this.board = board;
 
         //return randomMove();
-        int depth = 6;
-        return startAlphaBeta(board,depth);
+        int depth = 2;
+        SearchReturn pv = AlphaBeta(board,depth);
+        return pv.getLastMove();
     }
 }

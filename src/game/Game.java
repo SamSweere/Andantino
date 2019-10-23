@@ -8,7 +8,7 @@ import javax.swing.*;
 
 public class Game extends JPanel implements MouseListener {
     private final int radius = 25;
-    private final int boardRadius = 4;
+    private final int boardRadius = 3;
     //Game mode 0: AI vs AI, 1: Player vs AI (player is white); 2: AI vs Player (player is black); 3: Player vs player
     private final int gameMode;
 
@@ -76,12 +76,12 @@ public class Game extends JPanel implements MouseListener {
         while(!gameFinished){
             if(board.getPlayerTurn() == 1){
                 //aiWhite.updateBoard(board);
-                Tile aiMove = aiWhite.makeMove(board);
-                gameFinished = makeMove(aiMove.q,aiMove.r);
+                Move aiMove = aiWhite.makeMove(board);
+                gameFinished = makeMove(aiMove);
             }else{
                 //aiBlack.updateBoard(board);
-                Tile aiMove = aiBlack.makeMove(board);
-                gameFinished = makeMove(aiMove.q,aiMove.r);
+                Move aiMove  = aiBlack.makeMove(board);
+                gameFinished = makeMove(aiMove);
             }
         }
     }
@@ -90,10 +90,10 @@ public class Game extends JPanel implements MouseListener {
         //Update the ai board
         //ai.updateBoard(board);
 
-        Tile aiMoveTile = ai.makeMove(board);
+        Move aiMove = ai.makeMove(board);
 
         //Make the move on the board
-        gameFinished = makeMove(aiMoveTile.q,aiMoveTile.r);
+        gameFinished = makeMove(aiMove);
     }
 
 
@@ -252,10 +252,10 @@ public class Game extends JPanel implements MouseListener {
         boardHistory.add(new Board(board));
     }
 
-    private boolean makeMove(int q, int r){
-        int winningPlayer = boardCheck.checkWin(q,r, board);
+    private boolean makeMove(Move move){
+        int winningPlayer = boardCheck.checkWin(move.q, move.r, board);
 
-        board.setTileState(q,r,board.getPlayerTurn());
+        board.setTileState(move.q,move.r,board.getPlayerTurn());
 
         //add the move to the history
         addToHistory();
@@ -291,7 +291,7 @@ public class Game extends JPanel implements MouseListener {
 
                         //Check if the move is valid
                         if(boardCheck.checkValidMove(q,r, board, boardHistory.size())){
-                            gameFinished = makeMove(q,r);
+                            gameFinished = makeMove(new Move(q,r));
                             //Let a possible AI know it is his turn
                             if(gameMode == 1 || gameMode == 2){
                                 if(!gameFinished){
