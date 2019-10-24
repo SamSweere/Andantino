@@ -14,11 +14,14 @@ public class AI {
     private int nodesVisited;
     private fileWriter fw;
 
+    private String aiColorString;
+    private String oponentColorString;
+
     public static final int WIN = 100;
 
     private final int totalTime = 60*10;
     private final int maxTestTime = 60;
-    private final int maxMoveTime = 5;
+    private final int maxMoveTime = 2;
     //Max depth
     private final int maxDepth = 10;
 
@@ -30,8 +33,12 @@ public class AI {
         this.aiColor = aiColor;
         if(aiColor == 1){
             aiName = aiName + "_white";
+            aiColorString = "White";
+            oponentColorString = "Black";
         }else{
             aiName = aiName + "_black";
+            aiColorString = "Black";
+            oponentColorString = "White";
         }
         this.fw = new fileWriter(aiName);
 
@@ -256,15 +263,6 @@ public class AI {
     }
 
     private void printInformation(SearchReturn pv, float timeLapsed){
-        String aiColorString;
-        String oponentColorString;
-        if(aiColor == 1){
-            aiColorString = "White";
-            oponentColorString = "Black";
-        }else{
-            aiColorString = "Black";
-            oponentColorString = "White";
-        }
         if(pv.value == WIN){
             //We won for sure
             System.out.println("AI " + aiColorString + ": we will win in " + (pv.depth - 1) + " moves!!!");
@@ -276,7 +274,7 @@ public class AI {
         String nodesTime = "AI " + aiColorString + ": " + "Nodes visited: " + nodesVisited + " in " + timeLapsed;
         System.out.println(nodesTime);
         System.out.println("AI " + aiColorString + ": " +"Total time: " + totalTestTime);
-        System.out.println("TT collisions: " + tt.collisionCounter);
+        System.out.println("AI " + aiColorString + ": " + "TT collisions: " + tt.collisionCounter);
         //Reset the counter
         tt.collisionCounter = 0;
     }
@@ -310,7 +308,7 @@ public class AI {
         //Iterative deepening
         while(depth < maxDepth && !stopLoop){
             depth += 1;
-            System.out.println("Depth: " + depth);
+            //System.out.println("AI " + aiColorString + ": " + "Depth: " + depth);
 
             //For the intial move make a move with max values (impossible to do)
             //Save the pv on this depth (for instant win or loss cases)
@@ -320,13 +318,13 @@ public class AI {
             if(pvD.outOfTime){
                 //We are out of time, take the pv of one depth lower, thus do not update the pv
                 stopLoop = true;
-                System.out.println("Out of time, play depth: " + (depth-1));
+                System.out.println("AI " + aiColorString + ": " + "Out of time, play depth: " + (depth-1));
             }
             else if(pvD.value == WIN){
                 pv = pvD;
                 //We won no need to search further
                 stopLoop = true;
-                System.out.println("Stopping loop for win");
+                System.out.println("AI " + aiColorString + ": " + "Stopping loop for win");
             }
             else if(pvD.value == -1*WIN){
                 float timeElapsed = ((float)(System.currentTimeMillis() - startTime))/1000;
@@ -338,7 +336,7 @@ public class AI {
                 }
                 //pv = alphaBeta(new Board(board),1,alpha,beta, new Move(Integer.MAX_VALUE, Integer.MAX_VALUE), hash);
                 stopLoop = true;
-                System.out.println("Detected loss, play on depth where loss was not yet detected");
+                System.out.println("AI " + aiColorString + ": " + "Detected loss, play on depth where loss was not yet detected");
             }else{
                 //Update the pv
                 pv = pvD;
@@ -352,7 +350,7 @@ public class AI {
         totalTestTime += (int)timeElapsed;
 
         if(totalTestTime > maxTestTime){
-            System.out.println("Test complete, you can stop");
+            System.out.println("AI " + aiColorString + ": " + "Test complete, you can stop");
         }else{
             fw.writeLine(depth,timeElapsed,nodesVisited);
         }
