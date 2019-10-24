@@ -1,9 +1,6 @@
 package game;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static java.lang.Integer.*;
@@ -23,9 +20,13 @@ public class AI {
 
     private final int totalTime = 60*10;
     private final int maxTestTime = 60;
-    private final int maxMoveTime = 2;
+    private final int maxMoveTime = 3;
     //Max depth
-    private final int maxDepth = 6;
+    private final int maxDepth = 10;
+    private final int boardRadius;
+
+    private String log = "";
+
 
     private int totalTestTime = 0;
     private TT tt;
@@ -45,6 +46,7 @@ public class AI {
         this.fw = new fileWriter(aiName);
 
         this.tt = new TT(boardRadius);
+        this.boardRadius = boardRadius;
     }
 
     //public void updateBoard(Board board){
@@ -62,18 +64,165 @@ public class AI {
         return playableTiles.get(randomNum);
     }
 
-    private int evaluate(Board board, Move move){
+    private int floodFill(Tile startingPoint, Board board){
+        Board boardFF = new Board(board);
+
+        Stack st = new Stack();
+        st.add(startingPoint);
+
+        int player = boardFF.getTileState(startingPoint.q, startingPoint.r);
+
+        int connectedTiles = 0;
+
+        while(!st.empty()){
+            Tile tile = (Tile)st.pop();
+
+            //Set tile as localy visited
+            boardFF.setTileStateFF(tile.q, tile.r, 4);
+
+            //For every neighbor
+            for(int q = -1; q <= 1; q++){
+                for(int r = -1; r <= 1; r++){
+                    if(q != r){
+                        int checkQ = tile.q + q;
+                        int checkR = tile.r + r;
+                        if(checkQ + checkR < boardRadius || checkR + checkQ > 3*boardRadius || checkQ < 0 || checkR < 0
+                                || checkQ > boardRadius*2 || checkR > boardRadius*2){
+                            //Search out of bounds
+                        }
+                        else if(boardFF.getTileState(checkQ,checkR) == player){
+                            //Tile of player
+                            connectedTiles += 1;
+                            continue;
+                        }
+                        else if(boardFF.getTileState(checkQ,checkR) == 4){
+                            //Tile already visited
+                            continue;
+                        }
+                        else{
+                            //add tile to the stack
+                            st.add(boardFF.getTile(checkQ,checkR));
+                        }
+                    }
+                }
+            }
+        }
+
+        return connectedTiles;
+    }
+
+    private int evaluateGroupsize(Board board, Move move){
+        //Make the move on this board
+        int playerTurn = board.getPlayerTurn();
+        board.setTileState(move.q, move.r, playerTurn);
+
+        int scoreWhite = 0;
+        int scoreBlack = 0;
+
+        //Based of floodfill
+        //For every playable tile of the board do:
+        for(int q = 0; q < boardRadius*2+1; q++) {
+            for (int r = 0; r < boardRadius * 2 + 1; r++) {
+                if (r + q >= boardRadius && r + q <= 3 * boardRadius) {
+                    int tileOfPlayer = board.getTileState(q,r);
+                    if(tileOfPlayer == 1){
+                        scoreWhite += floodFill(new Tile(q,r,tileOfPlayer,false), board);
+                    }else if(tileOfPlayer == -1){
+                        scoreBlack += floodFill(new Tile(q,r,tileOfPlayer,false), board);
+                    }
+                }
+            }
+        }
+
+
         //Win == 100, lose == -100
         // nextInt is normally exclusive of the top value,
         // so add 1 to make it inclusive
-        int randomNum = ThreadLocalRandom.current().nextInt(99, 99 + 1);
+        //int randomNum = ThreadLocalRandom.current().nextInt(99, 99 + 1);
 
         //TODO: turned of random eval
         //return randomNum;
-        return 0;
+
+        int relativeDiference = (int)((((float)scoreWhite)/((float)(scoreWhite+scoreBlack))
+                - ((float)scoreBlack)/((float)(scoreWhite+scoreBlack)))*99);
+        //System.out.println(relativeDiference);
+
+        return relativeDiference;
     }
 
-    private SearchReturn alphaBeta(Board board, int depth, int alpha, int beta, Move move, long hash){
+    private int evaluateConnections(Board board, Move move){
+        //Make the move on this board
+        int playerTurn = board.getPlayerTurn();
+        board.setTileState(move.q, move.r, playerTurn);
+
+        int scoreWhite = 0;
+        int scoreBlack = 0;
+
+        //Only have to traverse the board once
+        //For every playable tile of the board do:
+        for(int q = 0; q < boardRadius*2+1; q++) {
+            for (int r = 0; r < boardRadius * 2 + 1; r++) {
+                if (r + q >= boardRadius && r + q <= 3 * boardRadius) {
+                    int player = board.getTileState(q,r);
+
+                    //Give a point for the tile itself
+                    int playerScore = 1;
+
+                    if(player == -1 || player ==1){
+
+                        //For every neighbor
+                        for(int qN = -1; qN <= 1; qN++){
+                            for(int rN = -1; rN <= 1; rN++){
+                                if(qN != rN){
+                                    int checkQ = q + qN;
+                                    int checkR = r + rN;
+                                    if(checkQ + checkR < boardRadius || checkR + checkQ > 3*boardRadius || checkQ < 0 || checkR < 0
+                                            || checkQ > boardRadius*2 || checkR > boardRadius*2){
+                                        //Search out of bounds
+                                    }
+                                    else if(board.getTileState(checkQ,checkR) == player){
+                                        //Tile of player
+                                        playerScore += 1;
+                                        continue;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if(player == 1){
+                        scoreWhite += playerScore;
+                    }else if(player == -1){
+                        scoreBlack += playerScore;
+                    }
+                }
+            }
+        }
+
+        int relativeDiference = (int)((((float)scoreWhite)/((float)(scoreWhite+scoreBlack))
+                - ((float)scoreBlack)/((float)(scoreWhite+scoreBlack)))*99);
+        //System.out.println(relativeDiference);
+
+        return relativeDiference;
+    }
+
+    private int evaluate(Board board, Move move){
+        //Score is always in favour of white and should be reversible (-1*score)
+        return evaluateConnections(new Board(board),move);
+        //TODO: put back good eval
+        //return 0;
+    }
+
+    private SearchReturn alphaBeta(Board board, int depth, int targetDepth, int alpha, int beta, Move move, long hash){
+        int layerDepth = targetDepth - depth;
+
+        logBuilder(-1,alpha,beta,layerDepth,false);
+
+        //TODO: for log builder, can be removed
+        boolean pruning = false;
+
+
+
         //Save the old alpha in case of tt hit
         int olda = alpha;
 
@@ -100,6 +249,7 @@ public class AI {
             TT.TTElement ttElem = tt.checkTT(hash);
             if(ttElem != null){
                 //Board is present in TT
+                //TODO: changed layerDepth here, check if correct
                 if(depth <= ttElem.depth){
                     if(ttElem.flag == 0){
                         //Exact value
@@ -123,7 +273,8 @@ public class AI {
                 }
                 else{
                     //TODO: first investigate stored move, move ordering
-                    ttMove = ttElem.move;
+                    //TODO: move ordering enable here
+                    //ttMove = ttElem.move;
                 }
 
             }
@@ -136,18 +287,33 @@ public class AI {
                 if(winState != 0){
                     //A win state has been found, this is thus a leaf node.
                     //Remember, this is negamax
-                    if(winState == board.getPlayerTurn()){
-                        //Negamax is a bit confusing
-                        sr.setValue(-1*WIN);
-                    } else {
+                    //We ahve not made the move yet, thus take inverse
+                    if(winState == -1*board.getPlayerTurn()){
                         sr.setValue(WIN);
+                    } else {
+                        sr.setValue(-1*WIN);
                     }
 
                 }
                 else if(depth == 0) {
                     //Max depth reached without win, now evaluate
-                    sr.setValue(evaluate(board,move));
+                    //The evaluation function is always positive to white
+                    //Negamax thus invert
+                    //We ahve not made the move yet, thus take inverse
+                    if(-1*board.getPlayerTurn() == 1){
+                        sr.setValue(evaluate(board,move));
+                    }else{
+                        sr.setValue(-1*evaluate(board,move));
+                    }
+                    /**if(board.getPlayerTurn() == aiColor){
+                        sr.setValue(-1*evaluate(board,move));
+                    }else{
+                        sr.setValue(evaluate(board,move));
+                    }**/
+
                 }
+                //TODO:log builder here
+                logBuilder(sr.value,alpha,beta,layerDepth,false);
                 return sr;
             }
 
@@ -188,16 +354,19 @@ public class AI {
         //Initiate the principle variation class
         SearchReturn pv = null;
 
-        int score = -1*WIN;
+        //Minimum score is a loss
+        int score = -1* MAX_VALUE;
         //Move bestMove;
 
         while(!moveOrder.isEmpty()){
             //Get the best next move from the moveOrder que
             Move childMove = moveOrder.remove();
 
-            SearchReturn sr = alphaBeta(new Board(board), depth -1, -1*beta, -1*alpha, childMove, hash);
+            SearchReturn sr = alphaBeta(new Board(board), depth -1,targetDepth, -1*beta, -1*alpha, childMove, hash);
             //Negamax, -1*value
             sr.value = -1*sr.value;
+
+
 
             //Check for out of time
             if(sr.outOfTime){
@@ -223,6 +392,7 @@ public class AI {
             }
             if(score >= beta){
                 //prune
+                pruning = true;
                 break;
             }
         }
@@ -246,29 +416,59 @@ public class AI {
         //Store it in the tt
         //Negamax store the inverse
         if (pv != null) {
-            tt.storeTT(hash,flag,-1*score,depth, pv.getLastMove());
+            //TODO: check if the score is saved correctly
+            tt.storeTT(hash,flag,score,depth, pv.getLastMove());
         }
-
+        //TODO:log builder here
+        logBuilder(pv.value,alpha,beta,layerDepth,pruning);
         return pv;
     }
 
-    private void printInformation(SearchReturn pv, float timeLapsed){
+    private void printInformation(Board board, SearchReturn pv, float timeLapsed){
         if(pv.value == WIN){
             //We won for sure
             System.out.println("AI " + aiColorString + ": we will win in " + (pv.depth - 1) + " moves!!!");
         }
-        if(pv.value == -1*WIN){
+        else if(pv.value == -1*WIN){
             //We lost for sure
             System.out.println("AI " + aiColorString + ": we will lose in at least " + (pv.depth-1) + " moves!!!");
         }
+
+        System.out.println("AI " + aiColorString + ": best value " + (pv.value));
+
         String nodesTime = "AI " + aiColorString + ": " + "Nodes visited: " + nodesVisited + " in " + timeLapsed;
         System.out.println(nodesTime);
         System.out.println("AI " + aiColorString + ": " +"Total time: " + totalTestTime);
+        System.out.println("AI " + aiColorString + ": " + "board value " + evaluate(board,pv.getLastMove()));
         System.out.println("AI " + aiColorString + ": " + "TT collisions: " + tt.collisionCounter);
+        System.out.println(" ");
         //Reset the counter
         tt.collisionCounter = 0;
     }
 
+    private void logBuilder(int value, int alpha, int beta, int depth, boolean prune){
+        String spacing = "";
+        for(int i = 0; i < depth; i++){
+            spacing = spacing + "   ";
+        }
+
+        String pruning = "";
+        if(prune){
+            pruning = ";Prune";
+        }
+
+        int player = 0;
+        String playerName = "";
+        if(player == 1){
+            playerName = "Max player";
+        }
+        else if(player == -1){
+            playerName = "Min player";
+        }
+
+        String line = spacing + ";Value: "+ value + ";Alpha: " + alpha + ";Beta: " + beta + pruning;
+        //System.out.println(line);
+    }
 
 
     public Move makeMove(Board board){
@@ -299,8 +499,36 @@ public class AI {
         while(depth < maxDepth && !stopLoop){
             depth += 1;
             //System.out.println("AI " + aiColorString + ": " + "Depth: " + depth);
+            int targetDepth = maxDepth;
+            //For the intial move make a move with max values
+            //Save the pv on this depth (for instant win or loss cases)
+            SearchReturn pvD = alphaBeta(new Board(board),depth,targetDepth,alpha,beta, new Move(Integer.MAX_VALUE, Integer.MAX_VALUE), hash);
 
-            //For the intial move make a move with max values (impossible to do)
+            //Check for out of time
+            if(pvD.outOfTime){
+                //We are out of time, take the pv of one depth lower, thus do not update the pv
+                stopLoop = true;
+                System.out.println("AI " + aiColorString + ": " + "Out of time, play depth: " + (depth-1));
+            }
+            else{
+                //This construction could trigger a null in pv when debugging
+                //This is not really a problem otherwise since you will have enough time to do a search
+                //on depth 1
+                pv = pvD;
+
+                /**System.out.println("AI " + aiColorString + ": " + "Pv value in main loop: " + pv.value);
+
+                if(pv.value == WIN){
+                    System.out.println("AI " + aiColorString + ": " + "we win!");
+                }
+                if(pv.value == -1*WIN){
+                    System.out.println("AI " + aiColorString + ": " + "we lose!");
+                }
+                System.out.println("");**/
+            }
+
+        /**
+         //For the intial move make a move with max values (impossible to do)
             //Save the pv on this depth (for instant win or loss cases)
             SearchReturn pvD = alphaBeta(new Board(board),depth,alpha,beta, new Move(Integer.MAX_VALUE, Integer.MAX_VALUE), hash);
 
@@ -309,7 +537,7 @@ public class AI {
                 //We are out of time, take the pv of one depth lower, thus do not update the pv
                 stopLoop = true;
                 System.out.println("AI " + aiColorString + ": " + "Out of time, play depth: " + (depth-1));
-            }/**
+            }
             else if(pvD.value == WIN){
                 pv = pvD;
                 //We won no need to search further
@@ -327,11 +555,12 @@ public class AI {
                 //pv = alphaBeta(new Board(board),1,alpha,beta, new Move(Integer.MAX_VALUE, Integer.MAX_VALUE), hash);
                 stopLoop = true;
                 System.out.println("AI " + aiColorString + ": " + "Detected loss, play on depth where loss was not yet detected");
-            }**/else{
+            }else{
                 //Update the pv
                 pv = pvD;
-            }
+            }**/
         }
+
 
 
         Move move = pv.getLastMove();
@@ -339,13 +568,15 @@ public class AI {
         float timeElapsed = ((float)(System.currentTimeMillis() - startTime))/1000;
         totalTestTime += (int)timeElapsed;
 
-        if(totalTestTime > maxTestTime){
+        /**if(totalTestTime > maxTestTime){
             System.out.println("AI " + aiColorString + ": " + "Test complete, you can stop");
         }else{
             fw.writeLine(depth,timeElapsed,nodesVisited);
-        }
+        }**/
 
-        printInformation(pv, timeElapsed);
+        //For some reason passing only the board will change the board
+        //TODO: enable this back
+        printInformation(board, pv, timeElapsed);
 
         return move;
     }
