@@ -6,20 +6,17 @@ import java.util.ArrayList;
 public class SearchReturn{
     public int value;
     private ArrayList<Move> pv;
-    public int depth = 0;
+    public int depth;
     public boolean outOfTime = false;
 
     public SearchReturn(boolean outOfTime){
         this.outOfTime = outOfTime;
     }
 
-    public SearchReturn(Move move){
+    public SearchReturn(Move move, int depth){
+        this.depth = depth;
         this.pv = new ArrayList<>();
         pv.add(move);
-    }
-
-    public SearchReturn(int value){
-        this.value = value;
     }
 
     public SearchReturn(SearchReturn sr){
@@ -31,6 +28,10 @@ public class SearchReturn{
 
     public void setValue(int value){
         this.value = value;
+    }
+
+    public void setDepth(int depth){
+        this.depth = depth;
     }
 
     public void moveUp(Move move){

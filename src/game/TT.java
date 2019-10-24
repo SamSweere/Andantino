@@ -88,8 +88,8 @@ public class TT {
                 //No collision, return the found element
 
                 //TODO:this disables the TT
-                return null;
-                //return contents;
+                //return null;
+                return contents;
             }
         }
     }

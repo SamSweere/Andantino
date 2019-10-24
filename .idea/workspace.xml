@@ -6,8 +6,15 @@
       <change beforePath="$PROJECT_DIR$/Performance/testing_black.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Performance/testing_black.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Performance/testing_white.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Performance/testing_white.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/AI.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/AI.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/AITest.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/AITest.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/Game.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/Game.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/SearchReturn.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/SearchReturn.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/TT.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/TT.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/game/AI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/AI.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/game/AITest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/AITest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/game/Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/Game.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/game/SearchReturn.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/SearchReturn.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/game/TT.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/TT.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -163,9 +170,24 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/game/TT.java</url>
-          <line>131</line>
-          <option name="timeStamp" value="102" />
+          <url>file://$PROJECT_DIR$/src/game/AI.java</url>
+          <line>286</line>
+          <option name="timeStamp" value="123" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/game/AI.java</url>
+          <line>280</line>
+          <option name="timeStamp" value="124" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/game/AI.java</url>
+          <line>276</line>
+          <option name="timeStamp" value="127" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/game/AI.java</url>
+          <line>298</line>
+          <option name="timeStamp" value="132" />
         </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>

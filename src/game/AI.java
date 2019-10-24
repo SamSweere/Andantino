@@ -23,7 +23,7 @@ public class AI {
     private final int maxTestTime = 60;
     private final int maxMoveTime = 2;
     //Max depth
-    private final int maxDepth = 10;
+    private final int maxDepth = 8;
 
     private int totalTestTime = 0;
     private TT tt;
@@ -66,7 +66,9 @@ public class AI {
         // so add 1 to make it inclusive
         int randomNum = ThreadLocalRandom.current().nextInt(99, 99 + 1);
 
-        return randomNum;
+        //TODO: turned of random eval
+        //return randomNum;
+        return 0;
     }
 
     private SearchReturn alphaBeta(Board board, int depth, int alpha, int beta, Move move, long hash){
@@ -89,10 +91,10 @@ public class AI {
             TT.TTElement ttElem = tt.checkTT(hash);
             if(ttElem != null){
                 //Board is present in TT
-                if(ttElem.depth >= depth){
-                    if(ttElem.flag == 1){
+                if(depth <= ttElem.depth){
+                    if(ttElem.flag == 0){
                         //Exact value
-                        SearchReturn sr = new SearchReturn(move);
+                        SearchReturn sr = new SearchReturn(move, ttElem.depth);
                         sr.setValue(ttElem.value);
                         return sr;
                     }
@@ -105,10 +107,13 @@ public class AI {
                         beta = min(beta, ttElem.value);
                     }
                     if(alpha >= beta){
-                        SearchReturn sr = new SearchReturn(move);
+                        SearchReturn sr = new SearchReturn(move, ttElem.depth);
                         sr.setValue(ttElem.value);
                         return sr;
                     }
+                }
+                else{
+                    //TODO: first investigate stored move, move ordering
                 }
 
             }
@@ -117,9 +122,10 @@ public class AI {
             //winState = 0 means no win state reached
             if(winState != 0 || depth == 0){
                 //This is a leaf node, make new searchReturn object
-                SearchReturn sr = new SearchReturn(move);
+                SearchReturn sr = new SearchReturn(move, 1);
                 if(winState != 0){
                     //A win state has been found, this is thus a leaf node.
+                    //Remember, this is negamax
                     if(winState == -1*board.getPlayerTurn()){
                         sr.setValue(WIN);
                     } else {
@@ -145,12 +151,11 @@ public class AI {
         ArrayList<Tile> playableTiles = board.getPlayableTiles();
 
         //Initiate the principle variation class
-        SearchReturn pv = new SearchReturn(-1*Integer.MAX_VALUE);
+        SearchReturn pv = null;
 
-
-        //Set the initial pv to the smallest value possible for max
-        //pv = new SearchReturn(-1*Integer.MAX_VALUE);
-        int score = -1*Integer.MAX_VALUE;
+        //Set the initial pv
+        pv = null;
+        int score = -1*WIN;
         //Move bestMove;
 
         for(int childBoardNum = 0; childBoardNum < playableTiles.size(); childBoardNum++) {
@@ -166,6 +171,12 @@ public class AI {
             if(sr.outOfTime){
                 //Return out of time searchresult
                 return sr;
+            }
+
+            //Check if there is a principle variation, if not put this move in it
+            if(pv == null){
+                pv = sr;
+                pv.moveUp(childMove);
             }
 
             //Set the pv initially on the first search return
@@ -188,10 +199,12 @@ public class AI {
         int flag;
         //Add to the tt
         if(score <= olda){
+            //Fail low
             //Flag upperbound
             flag = 2;
         }
         else if(score >= beta){
+            //Fail high
             //Flag lowerbound
             flag = 1;
         }
@@ -200,7 +213,8 @@ public class AI {
             flag = 0;
         }
         //Store it in the tt
-        tt.storeTT(hash,flag,score,depth);
+        //Negamax store the inverse
+        tt.storeTT(hash,flag,-1*score,depth);
 
         return pv;
     }
@@ -238,7 +252,7 @@ public class AI {
         int depth = 0;
 
         //Save the principal variation, we need to initialize something since the real value will be created in the
-        SearchReturn pv = new SearchReturn(0);
+        SearchReturn pv = null;
 
         //Get the hash of the current board
         long hash = tt.getHash(board);

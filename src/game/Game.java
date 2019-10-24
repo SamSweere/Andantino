@@ -281,14 +281,14 @@ public class Game extends JPanel implements MouseListener {
 
         //When the tile is drawn show the possible win message
         if(winningPlayer == 1){
-            System.out.println("Player one (White) won!");
-            JOptionPane.showMessageDialog(null, "Player 1 won!");
+            System.out.println("Player one (White) wins!");
+            JOptionPane.showMessageDialog(null, "Player 1 (White) wins!");
             //Game is finished
             return true;
         }
         else if(winningPlayer == -1){
-            System.out.println("Player two (Black) won!");
-            JOptionPane.showMessageDialog(null, "Player 2 won!");
+            System.out.println("Player two (Black) wins!");
+            JOptionPane.showMessageDialog(null, "Player 2 (Black) wins!");
             //Game is finished
             return true;
         }
