@@ -72,7 +72,6 @@ public class AI {
     private SearchReturn alphaBeta(Board board, int depth, int alpha, int beta, Move move, long hash){
         //Save the old alpha in case of tt hit
         int olda = alpha;
-        int oldb = beta;
 
         //Get the time
         float timeElapsed = ((float)(System.currentTimeMillis() - startTime))/1000;
@@ -121,7 +120,7 @@ public class AI {
                 SearchReturn sr = new SearchReturn(move);
                 if(winState != 0){
                     //A win state has been found, this is thus a leaf node.
-                    if(winState == aiColor){
+                    if(winState == -1*board.getPlayerTurn()){
                         sr.setValue(WIN);
                     } else {
                         sr.setValue(-1*WIN);
@@ -148,116 +147,60 @@ public class AI {
         //Initiate the principle variation class
         SearchReturn pv = new SearchReturn(-1*Integer.MAX_VALUE);
 
-        //Check if min or max player
-        if(board.getPlayerTurn() == aiColor){
-            //Max player
 
-            //Set the initial pv to the smallest value possible for max
-            //pv = new SearchReturn(-1*Integer.MAX_VALUE);
-            int score = -1*Integer.MAX_VALUE;
-            //Move bestMove;
+        //Set the initial pv to the smallest value possible for max
+        //pv = new SearchReturn(-1*Integer.MAX_VALUE);
+        int score = -1*Integer.MAX_VALUE;
+        //Move bestMove;
 
-            for(int childBoardNum = 0; childBoardNum < playableTiles.size(); childBoardNum++) {
-                int childMoveQ = playableTiles.get(childBoardNum).q;
-                int childMoveR = playableTiles.get(childBoardNum).r;
-                Move childMove = new Move(childMoveQ, childMoveR);
+        for(int childBoardNum = 0; childBoardNum < playableTiles.size(); childBoardNum++) {
+            int childMoveQ = playableTiles.get(childBoardNum).q;
+            int childMoveR = playableTiles.get(childBoardNum).r;
+            Move childMove = new Move(childMoveQ, childMoveR);
 
-                SearchReturn sr = alphaBeta(new Board(board), depth -1, alpha, beta, childMove, hash);
+            SearchReturn sr = alphaBeta(new Board(board), depth -1, -1*beta, -1*alpha, childMove, hash);
+            //Negamax, -1*value
+            sr.value = -1*sr.value;
 
-                //Check for out of time
-                if(sr.outOfTime){
-                    //Return out of time searchresult
-                    return sr;
-                }
-
-                //Set the pv initially on the first search return
-                if(sr.value > score){
-                    pv = sr;
-                    score = sr.value;
-
-                    pv.moveUp(childMove);
-                    //System.out.println("New best pv! : " + pv.getLastMove().q + " " + pv.getLastMove().r + " with " + pv.value);
-                }
-                if(sr.value > alpha){
-                    alpha = sr.value;
-                }
-                if(alpha >= beta){
-                    //prune
-                    break;
-                }
+            //Check for out of time
+            if(sr.outOfTime){
+                //Return out of time searchresult
+                return sr;
             }
 
-            int flag;
-            //Add to the tt
-            if(score <= olda){
-                //Flag upperbound
-                flag = 2;
-            }
-            else if(score >= oldb){
-                //Flag lowerbound
-                flag = 1;
-            }
-            else{
-                //Flag is exact
-                flag = 0;
-            }
-            //Store it in the tt
-            tt.storeTT(hash,flag,score,depth);
-        }
-        else {
-            //Min player
+            //Set the pv initially on the first search return
+            if(sr.value > score){
+                pv = sr;
+                score = sr.value;
 
-            //Set the initial pv to the biggest value possible for max
-            //pv = new SearchReturn(Integer.MAX_VALUE);
-            int score = Integer.MAX_VALUE;
-
-            for (int childBoardNum = 0; childBoardNum < playableTiles.size(); childBoardNum++) {
-                int childMoveQ = playableTiles.get(childBoardNum).q;
-                int childMoveR = playableTiles.get(childBoardNum).r;
-                Move childMove = new Move(childMoveQ, childMoveR);
-
-                SearchReturn sr = alphaBeta(new Board(board), depth - 1, alpha, beta, childMove, hash);
-
-                //Check for out of time
-                if(sr.outOfTime){
-                    //Return out of time searchresult
-                    return sr;
-                }
-
-                //Set the pv initially on the first search return
-                if (sr.value < score) {
-                    pv = sr;
-                    score = sr.value;
-
-                    pv.moveUp(childMove);
-                }
-                if (sr.value < beta) {
-                    beta = sr.value;
-                }
-                if (alpha >= beta) {
-                    //prune
-                    break;
-                }
+                pv.moveUp(childMove);
+                //System.out.println("New best pv! : " + pv.getLastMove().q + " " + pv.getLastMove().r + " with " + pv.value);
             }
-
-            int flag;
-            //Add to the tt
-            if(score <= olda){
-                //Flag upperbound
-                flag = 2;
+            if(sr.value > alpha){
+                alpha = sr.value;
             }
-            else if(score >= oldb){
-                //Flag lowerbound
-                flag = 1;
+            if(alpha >= beta){
+                //prune
+                break;
             }
-            else{
-                //Flag is exact
-                flag = 0;
-            }
-            //Store it in the tt
-            tt.storeTT(hash,flag,score,depth);
         }
 
+        int flag;
+        //Add to the tt
+        if(score <= olda){
+            //Flag upperbound
+            flag = 2;
+        }
+        else if(score >= beta){
+            //Flag lowerbound
+            flag = 1;
+        }
+        else{
+            //Flag is exact
+            flag = 0;
+        }
+        //Store it in the tt
+        tt.storeTT(hash,flag,score,depth);
 
         return pv;
     }
