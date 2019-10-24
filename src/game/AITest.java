@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.ThreadLocalRandom;
 
+import static java.lang.Integer.*;
+
 public class AITest {
-    private String aiName = "pruning_randomEval_T8";
+    private String aiName = "testing";
     private Board board;
     private final int aiColor;
     private final boardChecker boardCheck = new boardChecker();
@@ -14,8 +16,9 @@ public class AITest {
     private final int totalTime = 60*10;
     private final int maxTestTime = 60;
     private int totalTestTime = 0;
+    private TT tt;
 
-    public AITest(int aiColor){
+    public AITest(int aiColor, int boardRadius){
         this.aiColor = aiColor;
         if(aiColor == 1){
             aiName = aiName + "_white";
@@ -23,6 +26,8 @@ public class AITest {
             aiName = aiName + "_black";
         }
         this.fw = new fileWriter(aiName);
+
+        this.tt = new TT(boardRadius);
     }
 
     //public void updateBoard(Board board){
@@ -46,14 +51,47 @@ public class AITest {
         // so add 1 to make it inclusive
         int randomNum = ThreadLocalRandom.current().nextInt(99, 99 + 1);
 
+        randomNum = 0;
         return randomNum;
     }
 
-    private SearchReturn alphaBeta(Board board, int depth, int alpha, int beta, Move move){
+    private SearchReturn alphaBeta(Board board, int depth, int alpha, int beta, Move move, long hash){
+        //Save the old alpha in case of tt hit
+        int olda = alpha;
+        int oldb = beta;
         if(move.q == Integer.MAX_VALUE){
             //this is the start, no need to check winstates
         }else{
             nodesVisited += 1;
+
+            //Check if this board is in the tt
+            TT.TTElement ttElem = tt.checkTT(hash);
+            if(ttElem != null){
+                //Board is present in TT
+                if(ttElem.depth >= depth){
+                    if(ttElem.flag == 1){
+                        //Exact value
+                        SearchReturn sr = new SearchReturn(move);
+                        sr.setValue(ttElem.value);
+                        return sr;
+                    }
+                    else if(ttElem.flag == 1){
+                        //LowerBound
+                        alpha = max(alpha, ttElem.value);
+                    }
+                    else if(ttElem.flag == 2){
+                        //UpperBound
+                        beta = min(beta, ttElem.value);
+                    }
+                    if(alpha >= beta){
+                        SearchReturn sr = new SearchReturn(move);
+                        sr.setValue(ttElem.value);
+                        return sr;
+                    }
+                }
+
+            }
+
             int winState = boardCheck.checkWin(move.q, move.r, board);
             //winState = 0 means no win state reached
             if(winState != 0 || depth == 0){
@@ -76,7 +114,11 @@ public class AITest {
             }
 
             //No endstate is reached, make the actual move
-            board.setTileState(move.q, move.r, board.getPlayerTurn());
+            int playerTurn = board.getPlayerTurn();
+            board.setTileState(move.q, move.r, playerTurn);
+
+            //Update the hash
+            hash = tt.updateHash(hash, move, playerTurn);
         }
 
         ArrayList<Tile> playableTiles = board.getPlayableTiles();
@@ -98,7 +140,7 @@ public class AITest {
                 int childMoveR = playableTiles.get(childBoardNum).r;
                 Move childMove = new Move(childMoveQ, childMoveR);
 
-                SearchReturn sr = alphaBeta(new Board(board), depth -1, alpha, beta, childMove);
+                SearchReturn sr = alphaBeta(new Board(board), depth -1, alpha, beta, childMove, hash);
 
                 //Set the pv initially on the first search return
                 if(sr.value > score){
@@ -116,6 +158,23 @@ public class AITest {
                     break;
                 }
             }
+
+            int flag;
+            //Add to the tt
+            if(score <= olda){
+                //Flag upperbound
+                flag = 2;
+            }
+            else if(score >= oldb){
+                //Flag lowerbound
+                flag = 1;
+            }
+            else{
+                //Flag is exact
+                flag = 0;
+            }
+            //Store it in the tt
+            tt.storeTT(hash,flag,score,depth);
         }
         else {
             //Min player
@@ -129,7 +188,7 @@ public class AITest {
                 int childMoveR = playableTiles.get(childBoardNum).r;
                 Move childMove = new Move(childMoveQ, childMoveR);
 
-                SearchReturn sr = alphaBeta(new Board(board), depth - 1, alpha, beta, childMove);
+                SearchReturn sr = alphaBeta(new Board(board), depth - 1, alpha, beta, childMove, hash);
 
                 //Set the pv initially on the first search return
                 if (sr.value < score) {
@@ -146,7 +205,26 @@ public class AITest {
                     break;
                 }
             }
+
+            int flag;
+            //Add to the tt
+            if(score <= olda){
+                //Flag upperbound
+                flag = 2;
+            }
+            else if(score >= oldb){
+                //Flag lowerbound
+                flag = 1;
+            }
+            else{
+                //Flag is exact
+                flag = 0;
+            }
+            //Store it in the tt
+            tt.storeTT(hash,flag,score,depth);
         }
+
+
         return pv;
     }
 
@@ -168,8 +246,12 @@ public class AITest {
             //We lost for sure
             System.out.println("AI " + aiColorString + ": we will lose in at least " + (pv.depth-1) + " moves!!!");
         }
-        String nodesTime = "Nodes visited: " + nodesVisited + " in " + timeLapsed;
+        String nodesTime = "AI " + aiColorString + ": " + "Nodes visited: " + nodesVisited + " in " + timeLapsed;
         System.out.println(nodesTime);
+        System.out.println("AI " + aiColorString + ": " +"Total time: " + totalTestTime);
+        //System.out.println("TT collisions: " + tt.collisionCounter);
+        //Reset the counter
+        tt.collisionCounter = 0;
     }
 
 
@@ -188,8 +270,11 @@ public class AITest {
         int alpha = -1*Integer.MAX_VALUE;
         int beta = Integer.MAX_VALUE;
 
+        //Get the hash of the current board
+        long hash = tt.getHash(board);
+
         //For the intial move make a move with max values (impossible to do)
-        SearchReturn pv = alphaBeta(new Board(board),depth,alpha,beta, new Move(Integer.MAX_VALUE, Integer.MAX_VALUE));
+        SearchReturn pv = alphaBeta(new Board(board),depth,alpha,beta, new Move(Integer.MAX_VALUE, Integer.MAX_VALUE), hash);
         Move move = pv.getLastMove();
 
         long finish = System.currentTimeMillis();

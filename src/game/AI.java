@@ -7,7 +7,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import static java.lang.Integer.*;
 
 public class AI {
-    private String aiName = "pruning_randomEval_withTT_T8";
+    private String aiName = "testing";
     private Board board;
     private final int aiColor;
     private final boardChecker boardCheck = new boardChecker();
@@ -245,9 +245,10 @@ public class AI {
             //We lost for sure
             System.out.println("AI " + aiColorString + ": we will lose in at least " + (pv.depth-1) + " moves!!!");
         }
-        String nodesTime = "Nodes visited: " + nodesVisited + " in " + timeLapsed;
+        String nodesTime = "AI " + aiColorString + ": " + "Nodes visited: " + nodesVisited + " in " + timeLapsed;
         System.out.println(nodesTime);
-        System.out.println("TT collisions: " + tt.collisionCounter);
+        System.out.println("AI " + aiColorString + ": " +"Total time: " + totalTestTime);
+        //System.out.println("TT collisions: " + tt.collisionCounter);
         //Reset the counter
         tt.collisionCounter = 0;
     }
