@@ -20,9 +20,9 @@ public class AI {
 
     private final int totalTime = 60*10;
     private final int maxTestTime = 60;
-    private final int maxMoveTime = 3;
+    private final int maxMoveTime = 15;
     //Max depth
-    private final int maxDepth = 10;
+    private final int maxDepth = 12;
     private final int boardRadius;
 
     private String log = "";
