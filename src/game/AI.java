@@ -2,6 +2,8 @@ package game;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static java.lang.Integer.*;
@@ -23,7 +25,7 @@ public class AI {
     private final int maxTestTime = 60;
     private final int maxMoveTime = 2;
     //Max depth
-    private final int maxDepth = 8;
+    private final int maxDepth = 6;
 
     private int totalTestTime = 0;
     private TT tt;
@@ -75,11 +77,18 @@ public class AI {
         //Save the old alpha in case of tt hit
         int olda = alpha;
 
+        //Create the move order
+        Queue<Move> moveOrder = new LinkedList<>();
+
+        //For found tt Move
+        Move ttMove = null;
+
         //Get the time
         float timeElapsed = ((float)(System.currentTimeMillis() - startTime))/1000;
 
         if(move.q == Integer.MAX_VALUE){
             //this is the start, no need to check winstates
+            //There is no move to be done
         }else if(timeElapsed > maxMoveTime){
             //Out of time, return the out of time search result
             return new SearchReturn(true);
@@ -114,6 +123,7 @@ public class AI {
                 }
                 else{
                     //TODO: first investigate stored move, move ordering
+                    ttMove = ttElem.move;
                 }
 
             }
@@ -126,10 +136,11 @@ public class AI {
                 if(winState != 0){
                     //A win state has been found, this is thus a leaf node.
                     //Remember, this is negamax
-                    if(winState == -1*board.getPlayerTurn()){
-                        sr.setValue(WIN);
-                    } else {
+                    if(winState == board.getPlayerTurn()){
+                        //Negamax is a bit confusing
                         sr.setValue(-1*WIN);
+                    } else {
+                        sr.setValue(WIN);
                     }
 
                 }
@@ -140,7 +151,7 @@ public class AI {
                 return sr;
             }
 
-            //No endstate is reached, make the actual move
+
             int playerTurn = board.getPlayerTurn();
             board.setTileState(move.q, move.r, playerTurn);
 
@@ -148,20 +159,41 @@ public class AI {
             hash = tt.updateHash(hash, move, playerTurn);
         }
 
+        //Get all the playable tiles and convert them to moves in a que
         ArrayList<Tile> playableTiles = board.getPlayableTiles();
 
-        //Initiate the principle variation class
-        SearchReturn pv = null;
 
-        //Set the initial pv
-        pv = null;
-        int score = -1*WIN;
-        //Move bestMove;
+        //TODO: removed move ordering
+        //If a tt move is found add that first
+        if(ttMove != null){
+            moveOrder.add(ttMove);
+        }
 
         for(int childBoardNum = 0; childBoardNum < playableTiles.size(); childBoardNum++) {
             int childMoveQ = playableTiles.get(childBoardNum).q;
             int childMoveR = playableTiles.get(childBoardNum).r;
             Move childMove = new Move(childMoveQ, childMoveR);
+
+            //Do not add ttmove twice
+            if(ttMove != null){
+                if(ttMove.equals(childMove)){
+                    //skip this one
+                    continue;
+                }
+            }
+            moveOrder.add(childMove);
+        }
+
+
+        //Initiate the principle variation class
+        SearchReturn pv = null;
+
+        int score = -1*WIN;
+        //Move bestMove;
+
+        while(!moveOrder.isEmpty()){
+            //Get the best next move from the moveOrder que
+            Move childMove = moveOrder.remove();
 
             SearchReturn sr = alphaBeta(new Board(board), depth -1, -1*beta, -1*alpha, childMove, hash);
             //Negamax, -1*value
@@ -179,7 +211,6 @@ public class AI {
                 pv.moveUp(childMove);
             }
 
-            //Set the pv initially on the first search return
             if(sr.value > score){
                 pv = sr;
                 score = sr.value;
@@ -187,10 +218,10 @@ public class AI {
                 pv.moveUp(childMove);
                 //System.out.println("New best pv! : " + pv.getLastMove().q + " " + pv.getLastMove().r + " with " + pv.value);
             }
-            if(sr.value > alpha){
+            if(score > alpha){
                 alpha = sr.value;
             }
-            if(alpha >= beta){
+            if(score >= beta){
                 //prune
                 break;
             }
@@ -214,7 +245,9 @@ public class AI {
         }
         //Store it in the tt
         //Negamax store the inverse
-        tt.storeTT(hash,flag,-1*score,depth);
+        if (pv != null) {
+            tt.storeTT(hash,flag,-1*score,depth, pv.getLastMove());
+        }
 
         return pv;
     }
@@ -276,7 +309,7 @@ public class AI {
                 //We are out of time, take the pv of one depth lower, thus do not update the pv
                 stopLoop = true;
                 System.out.println("AI " + aiColorString + ": " + "Out of time, play depth: " + (depth-1));
-            }
+            }/**
             else if(pvD.value == WIN){
                 pv = pvD;
                 //We won no need to search further
@@ -294,7 +327,7 @@ public class AI {
                 //pv = alphaBeta(new Board(board),1,alpha,beta, new Move(Integer.MAX_VALUE, Integer.MAX_VALUE), hash);
                 stopLoop = true;
                 System.out.println("AI " + aiColorString + ": " + "Detected loss, play on depth where loss was not yet detected");
-            }else{
+            }**/else{
                 //Update the pv
                 pv = pvD;
             }

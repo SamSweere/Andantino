@@ -18,13 +18,15 @@ public class TT {
         public final byte depth;
         //flag: 0 exact value, 1: lower bound, 2:upper bound
         public final byte flag;
+        public final Move move;
 
         //TODO: this can be expanded
-        public TTElement(long primaryHash, int flag, int value, int depth){
+        public TTElement(long primaryHash, int flag, int value, int depth, Move move){
             this.primaryHash = primaryHash;
             this.flag = (byte)flag;
             this.value = value;
             this.depth = (byte)depth;
+            this.move = move;
         }
     }
 
@@ -88,13 +90,13 @@ public class TT {
                 //No collision, return the found element
 
                 //TODO:this disables the TT
-                //return null;
-                return contents;
+                return null;
+                //return contents;
             }
         }
     }
 
-    public void storeTT(long hash, int flag, int value, int depth){
+    public void storeTT(long hash, int flag, int value, int depth, Move move){
         //Most efficient way I could find to split long
         byte[] hashBytes = longToBytes(hash);
 
@@ -116,7 +118,7 @@ public class TT {
         int hashKey = (int)bytesToLong(hashKeyByte);
 
         //Make the tt element
-        TTElement ttElem = new TTElement(primaryHash, flag, value, depth);
+        TTElement ttElem = new TTElement(primaryHash, flag, value, depth, move);
 
         //Check if it is present in the tt
         TTElement contents = tt[hashKey];

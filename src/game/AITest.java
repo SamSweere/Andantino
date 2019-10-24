@@ -2,6 +2,8 @@ package game;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static java.lang.Integer.*;
@@ -21,9 +23,9 @@ public class AITest {
 
     private final int totalTime = 60*10;
     private final int maxTestTime = 60;
-    private final int maxMoveTime = 10;
+    private final int maxMoveTime = 2;
     //Max depth
-    private final int maxDepth = 6;
+    private final int maxDepth = 8;
 
     private int totalTestTime = 0;
     private TT tt;
@@ -75,11 +77,15 @@ public class AITest {
         //Save the old alpha in case of tt hit
         int olda = alpha;
 
+        //Create the move order
+        Move ttMove = null;
+
         //Get the time
         float timeElapsed = ((float)(System.currentTimeMillis() - startTime))/1000;
 
         if(move.q == Integer.MAX_VALUE){
             //this is the start, no need to check winstates
+            //There is no move to be done
         }else if(timeElapsed > maxMoveTime){
             //Out of time, return the out of time search result
             return new SearchReturn(true);
@@ -89,8 +95,6 @@ public class AITest {
 
             //Check if this board is in the tt
             TT.TTElement ttElem = tt.checkTT(hash);
-            //TODO: turned off tt table
-            ttElem = null;
             if(ttElem != null){
                 //Board is present in TT
                 if(depth <= ttElem.depth){
@@ -116,6 +120,7 @@ public class AITest {
                 }
                 else{
                     //TODO: first investigate stored move, move ordering
+                    ttMove = ttElem.move;
                 }
 
             }
@@ -142,7 +147,7 @@ public class AITest {
                 return sr;
             }
 
-            //No endstate is reached, make the actual move
+
             int playerTurn = board.getPlayerTurn();
             board.setTileState(move.q, move.r, playerTurn);
 
@@ -150,7 +155,31 @@ public class AITest {
             hash = tt.updateHash(hash, move, playerTurn);
         }
 
+        //Get all the playable tiles and convert them to moves in a que
         ArrayList<Tile> playableTiles = board.getPlayableTiles();
+
+        Queue<Move> moveOrder = new LinkedList<>();
+
+        //If a tt move is found add that first
+        if(ttMove != null){
+            moveOrder.add(ttMove);
+        }
+
+        for(int childBoardNum = 0; childBoardNum < playableTiles.size(); childBoardNum++) {
+            int childMoveQ = playableTiles.get(childBoardNum).q;
+            int childMoveR = playableTiles.get(childBoardNum).r;
+            Move childMove = new Move(childMoveQ, childMoveR);
+
+            //Do not add ttmove twice
+            if(ttMove != null){
+                if(ttMove.equals(childMove)){
+                    //skip this one
+                    continue;
+                }
+            }
+            moveOrder.add(childMove);
+        }
+
 
         //Initiate the principle variation class
         SearchReturn pv = null;
@@ -160,10 +189,9 @@ public class AITest {
         int score = -1*WIN;
         //Move bestMove;
 
-        for(int childBoardNum = 0; childBoardNum < playableTiles.size(); childBoardNum++) {
-            int childMoveQ = playableTiles.get(childBoardNum).q;
-            int childMoveR = playableTiles.get(childBoardNum).r;
-            Move childMove = new Move(childMoveQ, childMoveR);
+        while(!moveOrder.isEmpty()){
+            //Get the best next move from the moveOrder que
+            Move childMove = moveOrder.remove();
 
             SearchReturn sr = alphaBeta(new Board(board), depth -1, -1*beta, -1*alpha, childMove, hash);
             //Negamax, -1*value
@@ -216,7 +244,7 @@ public class AITest {
         }
         //Store it in the tt
         //Negamax store the inverse
-        tt.storeTT(hash,flag,-1*score,depth);
+        tt.storeTT(hash,flag,-1*score,depth, pv.getLastMove());
 
         return pv;
     }

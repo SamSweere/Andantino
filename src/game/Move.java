@@ -8,4 +8,11 @@ public class Move {
         this.q = q;
         this.r = r;
     }
+
+    public boolean equals(Move move){
+        if(this.q == move.q && this.r == move.r){
+            return true;
+        }
+        return false;
+    }
 }
