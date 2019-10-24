@@ -7,7 +7,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import static java.lang.Integer.*;
 
 public class AI {
-    private String aiName = "testing";
+    private String aiName = "pruning_randomEval_withTT_T8";
     private Board board;
     private final int aiColor;
     private final boardChecker boardCheck = new boardChecker();
