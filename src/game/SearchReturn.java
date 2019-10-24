@@ -7,6 +7,11 @@ public class SearchReturn{
     public int value;
     private ArrayList<Move> pv;
     public int depth = 0;
+    public boolean outOfTime = false;
+
+    public SearchReturn(boolean outOfTime){
+        this.outOfTime = outOfTime;
+    }
 
     public SearchReturn(Move move){
         this.pv = new ArrayList<>();

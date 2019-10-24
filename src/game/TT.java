@@ -4,9 +4,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import static java.lang.Math.pow;
 
 public class TT {
-    private final long[] zobristQ;
-    private final long[] zobristR;
-    private final long[] zobristS;
+    //q, r, s
+    private final long[][][] zobrist;
     private final int hashKeyBytes = 2;
     private final int hashKeyBits = hashKeyBytes*8;
     private TTElement[] tt;
@@ -87,7 +86,10 @@ public class TT {
             }
             else{
                 //No collision, return the found element
-                return contents;
+
+                //TODO:this disables the TT
+                return null;
+                //return contents;
             }
         }
     }
@@ -137,18 +139,15 @@ public class TT {
 
     public TT(int boardRadius){
         //Create the random values for every parameter
-        zobristQ = new long[boardRadius*2+1];
-        zobristR = new long[boardRadius*2+1];
-        zobristS = new long[3];
+        zobrist = new long[boardRadius*2+1][boardRadius*2+1][3];
 
         //Fill them with random long values
-        for(int i = 0; i < zobristQ.length; i++){
-            zobristQ[i] = ThreadLocalRandom.current().nextLong();
-            zobristR[i] = ThreadLocalRandom.current().nextLong();
-        }
-
-        for(int i = 0; i < zobristS.length; i++){
-            zobristS[i] = ThreadLocalRandom.current().nextLong();
+        for(int q = 0; q < boardRadius*2+1; q++){
+            for(int r = 0; r < boardRadius*2+1; r++){
+                for(int s = 0; s < 3; s++){
+                    zobrist[q][r][s] = ThreadLocalRandom.current().nextLong();
+                }
+            }
         }
 
         //Create the transposition table with size 2^hashKeyBits
@@ -162,16 +161,14 @@ public class TT {
         for(int q = 0; q < boardRadius*2+1; q++){
             for(int r = 0; r < boardRadius*2+1; r++){
                 if(r + q >= boardRadius&& r + q <= 3*boardRadius) {
-                    hashKey ^= zobristQ[q];
-                    hashKey ^= zobristR[r];
-
+                    //The state has to be translated to the good index
                     if(board.getTileState(q, r) == 1){
-                        hashKey ^= zobristS[1];
+                        hashKey ^= zobrist[q][r][1];
                     }else if(board.getTileState(q, r) == -1){
-                        hashKey ^= zobristS[2];
+                        hashKey ^= zobrist[q][r][2];
                     }
                     else{
-                        hashKey ^= zobristS[0];
+                        hashKey ^= zobrist[q][r][0];
                     }
 
                 }
@@ -181,8 +178,6 @@ public class TT {
     }
 
     public long updateHash(long hashKey, Move move, int player) {
-        hashKey ^= zobristQ[move.q];
-        hashKey ^= zobristR[move.r];
         //Make sure the playernumber is converted to the array acces value
         int playerNum = 0;
         if(player == 0){
@@ -191,7 +186,7 @@ public class TT {
         else if(player == -1){
             playerNum = 2;
         }
-        hashKey ^= zobristS[playerNum];
+        hashKey ^= zobrist[move.q][move.r][playerNum];
         return hashKey;
     }
 

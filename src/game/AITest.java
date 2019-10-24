@@ -15,8 +15,10 @@ public class AITest {
     private fileWriter fw;
     private final int totalTime = 60*10;
     private final int maxTestTime = 60;
+    private final int maxMoveTime = 10;
     private int totalTestTime = 0;
     private TT tt;
+    private long startTime;
 
     public AITest(int aiColor, int boardRadius){
         this.aiColor = aiColor;
@@ -51,7 +53,6 @@ public class AITest {
         // so add 1 to make it inclusive
         int randomNum = ThreadLocalRandom.current().nextInt(99, 99 + 1);
 
-        randomNum = 0;
         return randomNum;
     }
 
@@ -249,7 +250,7 @@ public class AITest {
         String nodesTime = "AI " + aiColorString + ": " + "Nodes visited: " + nodesVisited + " in " + timeLapsed;
         System.out.println(nodesTime);
         System.out.println("AI " + aiColorString + ": " +"Total time: " + totalTestTime);
-        //System.out.println("TT collisions: " + tt.collisionCounter);
+        System.out.println("TT collisions: " + tt.collisionCounter);
         //Reset the counter
         tt.collisionCounter = 0;
     }
@@ -261,24 +262,41 @@ public class AITest {
 
         nodesVisited = 0;
 
-        Date date = new Date();
-        long start = System.currentTimeMillis();
+        //Apply window of win lose
+        int alpha = -100;
+        int beta = 100;
 
-        //return randomMove();
-        int depth = 8;
+        //Max depth
+        int maxDepth = 8;
 
-        int alpha = -1*Integer.MAX_VALUE;
-        int beta = Integer.MAX_VALUE;
+        //initial depth
+        int depth = 0;
+
+        //Save the principal variation, we need to initialize something since the real value will be created in the
+        SearchReturn pv = new SearchReturn(0);
 
         //Get the hash of the current board
         long hash = tt.getHash(board);
 
-        //For the intial move make a move with max values (impossible to do)
-        SearchReturn pv = alphaBeta(new Board(board),depth,alpha,beta, new Move(Integer.MAX_VALUE, Integer.MAX_VALUE), hash);
+        startTime = System.currentTimeMillis();
+
+        float timeElapsed = ((float)(System.currentTimeMillis() - startTime))/1000;
+        //Iterative deepening
+        while(timeElapsed < maxMoveTime && depth < maxDepth){
+            depth += 1;
+            //For the intial move make a move with max values (impossible to do)
+            pv = alphaBeta(new Board(board),depth,alpha,beta, new Move(Integer.MAX_VALUE, Integer.MAX_VALUE), hash);
+
+
+            timeElapsed = ((float)(System.currentTimeMillis() - startTime))/1000;
+
+            System.out.println("Depth: " + depth);
+        }
+
+
         Move move = pv.getLastMove();
 
-        long finish = System.currentTimeMillis();
-        float timeElapsed = ((float)(finish - start))/1000;
+        timeElapsed = ((float)(System.currentTimeMillis() - startTime))/1000;
         totalTestTime += (int)timeElapsed;
 
         if(totalTestTime > maxTestTime){

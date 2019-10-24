@@ -13,10 +13,18 @@ public class AI {
     private final boardChecker boardCheck = new boardChecker();
     private int nodesVisited;
     private fileWriter fw;
+
+    public static final int WIN = 100;
+
     private final int totalTime = 60*10;
     private final int maxTestTime = 60;
+    private final int maxMoveTime = 5;
+    //Max depth
+    private final int maxDepth = 10;
+
     private int totalTestTime = 0;
     private TT tt;
+    private long startTime;
 
     public AI(int aiColor, int boardRadius){
         this.aiColor = aiColor;
@@ -58,9 +66,17 @@ public class AI {
         //Save the old alpha in case of tt hit
         int olda = alpha;
         int oldb = beta;
+
+        //Get the time
+        float timeElapsed = ((float)(System.currentTimeMillis() - startTime))/1000;
+
         if(move.q == Integer.MAX_VALUE){
             //this is the start, no need to check winstates
-        }else{
+        }else if(timeElapsed > maxMoveTime){
+            //Out of time, return the out of time search result
+            return new SearchReturn(true);
+        }
+        else{
             nodesVisited += 1;
 
             //Check if this board is in the tt
@@ -99,9 +115,9 @@ public class AI {
                 if(winState != 0){
                     //A win state has been found, this is thus a leaf node.
                     if(winState == aiColor){
-                        sr.setValue(100);
+                        sr.setValue(WIN);
                     } else {
-                        sr.setValue(-100);
+                        sr.setValue(-1*WIN);
                     }
 
                 }
@@ -140,6 +156,12 @@ public class AI {
                 Move childMove = new Move(childMoveQ, childMoveR);
 
                 SearchReturn sr = alphaBeta(new Board(board), depth -1, alpha, beta, childMove, hash);
+
+                //Check for out of time
+                if(sr.outOfTime){
+                    //Return out of time searchresult
+                    return sr;
+                }
 
                 //Set the pv initially on the first search return
                 if(sr.value > score){
@@ -189,6 +211,12 @@ public class AI {
 
                 SearchReturn sr = alphaBeta(new Board(board), depth - 1, alpha, beta, childMove, hash);
 
+                //Check for out of time
+                if(sr.outOfTime){
+                    //Return out of time searchresult
+                    return sr;
+                }
+
                 //Set the pv initially on the first search return
                 if (sr.value < score) {
                     pv = sr;
@@ -237,18 +265,18 @@ public class AI {
             aiColorString = "Black";
             oponentColorString = "White";
         }
-        if(pv.value == 100){
+        if(pv.value == WIN){
             //We won for sure
             System.out.println("AI " + aiColorString + ": we will win in " + (pv.depth - 1) + " moves!!!");
         }
-        if(pv.value == -100){
+        if(pv.value == -1*WIN){
             //We lost for sure
             System.out.println("AI " + aiColorString + ": we will lose in at least " + (pv.depth-1) + " moves!!!");
         }
         String nodesTime = "AI " + aiColorString + ": " + "Nodes visited: " + nodesVisited + " in " + timeLapsed;
         System.out.println(nodesTime);
         System.out.println("AI " + aiColorString + ": " +"Total time: " + totalTestTime);
-        //System.out.println("TT collisions: " + tt.collisionCounter);
+        System.out.println("TT collisions: " + tt.collisionCounter);
         //Reset the counter
         tt.collisionCounter = 0;
     }
@@ -260,24 +288,67 @@ public class AI {
 
         nodesVisited = 0;
 
-        Date date = new Date();
-        long start = System.currentTimeMillis();
+        //Apply window of win lose
+        int alpha = -WIN;
+        int beta = WIN;
 
-        //return randomMove();
-        int depth = 8;
 
-        int alpha = -1*Integer.MAX_VALUE;
-        int beta = Integer.MAX_VALUE;
+        //initial depth
+        int depth = 0;
+
+        //Save the principal variation, we need to initialize something since the real value will be created in the
+        SearchReturn pv = new SearchReturn(0);
 
         //Get the hash of the current board
         long hash = tt.getHash(board);
 
-        //For the intial move make a move with max values (impossible to do)
-        SearchReturn pv = alphaBeta(new Board(board),depth,alpha,beta, new Move(Integer.MAX_VALUE, Integer.MAX_VALUE), hash);
+        startTime = System.currentTimeMillis();
+
+        //This is for out of time, forced moves or definite wins
+        boolean stopLoop = false;
+
+        //Iterative deepening
+        while(depth < maxDepth && !stopLoop){
+            depth += 1;
+            System.out.println("Depth: " + depth);
+
+            //For the intial move make a move with max values (impossible to do)
+            //Save the pv on this depth (for instant win or loss cases)
+            SearchReturn pvD = alphaBeta(new Board(board),depth,alpha,beta, new Move(Integer.MAX_VALUE, Integer.MAX_VALUE), hash);
+
+            //Check for out of time
+            if(pvD.outOfTime){
+                //We are out of time, take the pv of one depth lower, thus do not update the pv
+                stopLoop = true;
+                System.out.println("Out of time, play depth: " + (depth-1));
+            }
+            else if(pvD.value == WIN){
+                pv = pvD;
+                //We won no need to search further
+                stopLoop = true;
+                System.out.println("Stopping loop for win");
+            }
+            else if(pvD.value == -1*WIN){
+                float timeElapsed = ((float)(System.currentTimeMillis() - startTime))/1000;
+                printInformation(pvD, timeElapsed);
+                //The program thinks that it has lost, go back to the depth where it didnt think it lost and play that move
+                //Thus do not update pv, but if the depth < 2, then do update the pv, otherwise it cant block
+                if(depth <= 2){
+                    pv = pvD;
+                }
+                //pv = alphaBeta(new Board(board),1,alpha,beta, new Move(Integer.MAX_VALUE, Integer.MAX_VALUE), hash);
+                stopLoop = true;
+                System.out.println("Detected loss, play on depth where loss was not yet detected");
+            }else{
+                //Update the pv
+                pv = pvD;
+            }
+        }
+
+
         Move move = pv.getLastMove();
 
-        long finish = System.currentTimeMillis();
-        float timeElapsed = ((float)(finish - start))/1000;
+        float timeElapsed = ((float)(System.currentTimeMillis() - startTime))/1000;
         totalTestTime += (int)timeElapsed;
 
         if(totalTestTime > maxTestTime){
