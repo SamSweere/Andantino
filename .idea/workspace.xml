@@ -2,10 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c0ba9a8c-ef6c-47a6-85e7-de882d7f4474" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/game/TT.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Performance/testing_black.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Performance/testing_white.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/AI.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/AI.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/Game.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/Game.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/SearchReturn.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/SearchReturn.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/game/AI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/AI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/game/SearchReturn.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/SearchReturn.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/game/Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/Game.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/game/TT.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/TT.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -160,21 +165,10 @@
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
-        <line-breakpoint enabled="true" type="java-field">
-          <url>file://$PROJECT_DIR$/src/game/AI.java</url>
-          <line>12</line>
-          <properties field="fw" class="game.AI" />
-          <option name="timeStamp" value="83" />
-        </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/game/AI.java</url>
-          <line>24</line>
-          <option name="timeStamp" value="84" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/game/AI.java</url>
-          <line>46</line>
-          <option name="timeStamp" value="86" />
+          <url>file://$PROJECT_DIR$/src/game/TT.java</url>
+          <line>129</line>
+          <option name="timeStamp" value="102" />
         </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>

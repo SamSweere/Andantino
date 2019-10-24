@@ -56,11 +56,11 @@ public class Game extends JPanel implements MouseListener {
                 break;
             case 1:
                 // Player vs AI, player is white
-                ai = new AI(-1);
+                ai = new AI(-1, boardRadius);
                 break;
             case 2:
                 // AI vs Player, player is black
-                ai = new AI(1);
+                ai = new AI(1, boardRadius);
                 playerVSaiGameAIMove();
                 break;
             case 3:
@@ -70,8 +70,8 @@ public class Game extends JPanel implements MouseListener {
     }
 
     private void aiVSaiGame(){
-        AI aiWhite = new AI(1);
-        AI aiBlack = new AI(-1);
+        AI aiWhite = new AI(1, boardRadius);
+        AI aiBlack = new AI(-1, boardRadius);
 
 
         //Roughly 30 fps
