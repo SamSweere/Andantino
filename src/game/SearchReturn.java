@@ -24,6 +24,7 @@ public class SearchReturn{
         this.pv = sr.pv;
         this.value = sr.value;
         this.depth = sr.depth;
+        this.outOfTime = sr.outOfTime;
     }
 
     public void setValue(int value){

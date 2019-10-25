@@ -18,9 +18,20 @@ public class AI {
 
     public static final int WIN = 100;
 
-    private final int totalTime = 60*10;
+    //TODO: make sure this is set correctly
+    private final int totalTime = 60;
+    private int timeLeft = totalTime;
+
+    private int expectedAmountOfMoves = 25;
+    private double takeYourTimePerc = 0.8;
+    private double panicPercentage = 0.08;
+    private int movesTaken = 0;
+    private double maxMoveTime;
+
+
+
     private final int maxTestTime = 60;
-    private final int maxMoveTime = 15;
+
     //Max depth
     private final int maxDepth = 12;
     private final int boardRadius;
@@ -143,8 +154,8 @@ public class AI {
         //TODO: turned of random eval
         //return randomNum;
 
-        int relativeDiference = (int)((((float)scoreWhite)/((float)(scoreWhite+scoreBlack))
-                - ((float)scoreBlack)/((float)(scoreWhite+scoreBlack)))*99);
+        int relativeDiference = (int)((((double)scoreWhite)/((double)(scoreWhite+scoreBlack))
+                - ((double)scoreBlack)/((double)(scoreWhite+scoreBlack)))*99);
         //System.out.println(relativeDiference);
 
         return relativeDiference;
@@ -199,8 +210,8 @@ public class AI {
             }
         }
 
-        int relativeDiference = (int)((((float)scoreWhite)/((float)(scoreWhite+scoreBlack))
-                - ((float)scoreBlack)/((float)(scoreWhite+scoreBlack)))*99);
+        int relativeDiference = (int)((((double)scoreWhite)/((double)(scoreWhite+scoreBlack))
+                - ((double)scoreBlack)/((double)(scoreWhite+scoreBlack)))*99);
         //System.out.println(relativeDiference);
 
         return relativeDiference;
@@ -208,9 +219,8 @@ public class AI {
 
     private int evaluate(Board board, Move move){
         //Score is always in favour of white and should be reversible (-1*score)
-        return evaluateConnections(new Board(board),move);
-        //TODO: put back good eval
-        //return 0;
+        int evalScore = evaluateConnections(new Board(board),move);
+        return evalScore;
     }
 
     private SearchReturn alphaBeta(Board board, int depth, int targetDepth, int alpha, int beta, Move move, long hash){
@@ -233,7 +243,7 @@ public class AI {
         Move ttMove = null;
 
         //Get the time
-        float timeElapsed = ((float)(System.currentTimeMillis() - startTime))/1000;
+        double timeElapsed = ((double)(System.currentTimeMillis() - startTime))/1000;
 
         if(move.q == Integer.MAX_VALUE){
             //this is the start, no need to check winstates
@@ -249,7 +259,6 @@ public class AI {
             TT.TTElement ttElem = tt.checkTT(hash);
             if(ttElem != null){
                 //Board is present in TT
-                //TODO: changed layerDepth here, check if correct
                 if(depth <= ttElem.depth){
                     if(ttElem.flag == 0){
                         //Exact value
@@ -272,9 +281,8 @@ public class AI {
                     }
                 }
                 else{
-                    //TODO: first investigate stored move, move ordering
-                    //TODO: move ordering enable here
-                    //ttMove = ttElem.move;
+                    //Add the tt move first to the que
+                    ttMove = ttElem.move;
                 }
 
             }
@@ -288,10 +296,14 @@ public class AI {
                     //A win state has been found, this is thus a leaf node.
                     //Remember, this is negamax
                     //We ahve not made the move yet, thus take inverse
+
+                    //Prefer fast wins and late losses
                     if(winState == -1*board.getPlayerTurn()){
+                        //Win
                         sr.setValue(WIN);
                     } else {
-                        sr.setValue(-1*WIN);
+                        //Lose
+                        sr.setValue(-1*(WIN));
                     }
 
                 }
@@ -328,8 +340,6 @@ public class AI {
         //Get all the playable tiles and convert them to moves in a que
         ArrayList<Tile> playableTiles = board.getPlayableTiles();
 
-
-        //TODO: removed move ordering
         //If a tt move is found add that first
         if(ttMove != null){
             moveOrder.add(ttMove);
@@ -376,12 +386,12 @@ public class AI {
 
             //Check if there is a principle variation, if not put this move in it
             if(pv == null){
-                pv = sr;
+                pv = new SearchReturn(sr);
                 pv.moveUp(childMove);
             }
 
             if(sr.value > score){
-                pv = sr;
+                pv = new SearchReturn(sr);
                 score = sr.value;
 
                 pv.moveUp(childMove);
@@ -414,7 +424,6 @@ public class AI {
             flag = 0;
         }
         //Store it in the tt
-        //Negamax store the inverse
         if (pv != null) {
             //TODO: check if the score is saved correctly
             tt.storeTT(hash,flag,score,depth, pv.getLastMove());
@@ -424,7 +433,7 @@ public class AI {
         return pv;
     }
 
-    private void printInformation(Board board, SearchReturn pv, float timeLapsed){
+    private void printInformation(Board board, SearchReturn pv, double timeLapsed){
         if(pv.value == WIN){
             //We won for sure
             System.out.println("AI " + aiColorString + ": we will win in " + (pv.depth - 1) + " moves!!!");
@@ -438,9 +447,10 @@ public class AI {
 
         String nodesTime = "AI " + aiColorString + ": " + "Nodes visited: " + nodesVisited + " in " + timeLapsed;
         System.out.println(nodesTime);
-        System.out.println("AI " + aiColorString + ": " +"Total time: " + totalTestTime);
         System.out.println("AI " + aiColorString + ": " + "board value " + evaluate(board,pv.getLastMove()));
-        System.out.println("AI " + aiColorString + ": " + "TT collisions: " + tt.collisionCounter);
+        //System.out.println("AI " + aiColorString + ": " + "TT collisions: " + tt.collisionCounter);
+        System.out.println("AI " + aiColorString + ": " +"Time for this move: " + maxMoveTime);
+        System.out.println("AI " + aiColorString + ": " +"Total time left: " + timeLeft);
         System.out.println(" ");
         //Reset the counter
         tt.collisionCounter = 0;
@@ -470,14 +480,23 @@ public class AI {
         //System.out.println(line);
     }
 
+    
 
     public Move makeMove(Board board){
         this.board = board;
 
+        //Set the moveTime
+        if(movesTaken < expectedAmountOfMoves){
+            maxMoveTime = (((double)totalTime)*takeYourTimePerc)/((double)expectedAmountOfMoves);
+        }else{
+            //Running out of time, take percentage of remaining
+            maxMoveTime = ((double)timeLeft)*panicPercentage;
+        }
+
         nodesVisited = 0;
 
-        //Apply window of win lose
-        int alpha = -WIN;
+        //Apply window of win lose + maxDepth
+        int alpha = -1*WIN;
         int beta = WIN;
 
 
@@ -502,7 +521,8 @@ public class AI {
             int targetDepth = maxDepth;
             //For the intial move make a move with max values
             //Save the pv on this depth (for instant win or loss cases)
-            SearchReturn pvD = alphaBeta(new Board(board),depth,targetDepth,alpha,beta, new Move(Integer.MAX_VALUE, Integer.MAX_VALUE), hash);
+            //Java and copying classes is not my strongest point, just in case copy the class
+            SearchReturn pvD = new SearchReturn(alphaBeta(new Board(board),depth,targetDepth,alpha,beta, new Move(Integer.MAX_VALUE, Integer.MAX_VALUE), hash));
 
             //Check for out of time
             if(pvD.outOfTime){
@@ -514,18 +534,35 @@ public class AI {
                 //This construction could trigger a null in pv when debugging
                 //This is not really a problem otherwise since you will have enough time to do a search
                 //on depth 1
-                pv = pvD;
+                pv = new SearchReturn(pvD);
 
-                /**System.out.println("AI " + aiColorString + ": " + "Pv value in main loop: " + pv.value);
+                //System.out.println("AI " + aiColorString + ": " + "Pv value in main loop: " + pv.value);
 
-                if(pv.value == WIN){
+                /**if(pv.value == -1*WIN){
                     System.out.println("AI " + aiColorString + ": " + "we win!");
                 }
-                if(pv.value == -1*WIN){
+                if(pv.value == WIN){
                     System.out.println("AI " + aiColorString + ": " + "we lose!");
                 }
-                System.out.println("");**/
+                //System.out.println("");**/
             }
+
+            /**else if(pvD.value == WIN){
+             pv = new SearchReturn(pvD);
+             //We won no need to search further
+             stopLoop = true;
+             System.out.println("AI " + aiColorString + ": " + "Stopping loop for win");
+             }**/
+            /**else if(pvD.value == -1*WIN) {
+             //The program thinks that it has lost, go back to the depth where it didnt think it lost and play that move
+             //Thus do not update pv, but if the depth < 2, then do update the pv, otherwise it cant block
+             if (depth <= 2) {
+             pv = new SearchReturn(pvD);
+             }
+             //pv = alphaBeta(new Board(board),1,alpha,beta, new Move(Integer.MAX_VALUE, Integer.MAX_VALUE), hash);
+             stopLoop = true;
+             System.out.println("AI " + aiColorString + ": " + "Detected loss, play on depth where loss was not yet detected");
+             }**/
 
         /**
          //For the intial move make a move with max values (impossible to do)
@@ -545,7 +582,7 @@ public class AI {
                 System.out.println("AI " + aiColorString + ": " + "Stopping loop for win");
             }
             else if(pvD.value == -1*WIN){
-                float timeElapsed = ((float)(System.currentTimeMillis() - startTime))/1000;
+                double timeElapsed = ((double)(System.currentTimeMillis() - startTime))/1000;
                 printInformation(pvD, timeElapsed);
                 //The program thinks that it has lost, go back to the depth where it didnt think it lost and play that move
                 //Thus do not update pv, but if the depth < 2, then do update the pv, otherwise it cant block
@@ -565,7 +602,10 @@ public class AI {
 
         Move move = pv.getLastMove();
 
-        float timeElapsed = ((float)(System.currentTimeMillis() - startTime))/1000;
+        //Update the time left
+        double timeElapsed = ((double)(System.currentTimeMillis() - startTime))/1000;
+        timeLeft = timeLeft - (int)timeElapsed;
+
         totalTestTime += (int)timeElapsed;
 
         /**if(totalTestTime > maxTestTime){
@@ -576,8 +616,10 @@ public class AI {
 
         //For some reason passing only the board will change the board
         //TODO: enable this back
-        printInformation(board, pv, timeElapsed);
+        printInformation(new Board(board), pv, timeElapsed);
 
+        //Update the move counter
+        movesTaken += 1;
         return move;
     }
 }
