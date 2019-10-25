@@ -19,8 +19,8 @@ public class AI {
     public static final int WIN = 100;
 
     //TODO: make sure this is set correctly
-    private final int totalTime = 60;
-    private int timeLeft = totalTime;
+    private final int totalTime = 60*2;
+    private double timeLeft = totalTime;
 
     private int expectedAmountOfMoves = 25;
     private double takeYourTimePerc = 0.8;
@@ -297,7 +297,6 @@ public class AI {
                     //Remember, this is negamax
                     //We ahve not made the move yet, thus take inverse
 
-                    //Prefer fast wins and late losses
                     if(winState == -1*board.getPlayerTurn()){
                         //Win
                         sr.setValue(WIN);
@@ -329,7 +328,7 @@ public class AI {
                 return sr;
             }
 
-
+            //Do the move
             int playerTurn = board.getPlayerTurn();
             board.setTileState(move.q, move.r, playerTurn);
 
@@ -387,7 +386,6 @@ public class AI {
             //Check if there is a principle variation, if not put this move in it
             if(pv == null){
                 pv = new SearchReturn(sr);
-                pv.moveUp(childMove);
             }
 
             if(sr.value > score){
@@ -448,7 +446,7 @@ public class AI {
         String nodesTime = "AI " + aiColorString + ": " + "Nodes visited: " + nodesVisited + " in " + timeLapsed;
         System.out.println(nodesTime);
         System.out.println("AI " + aiColorString + ": " + "board value " + evaluate(board,pv.getLastMove()));
-        //System.out.println("AI " + aiColorString + ": " + "TT collisions: " + tt.collisionCounter);
+        System.out.println("AI " + aiColorString + ": " + "TT collisions: " + tt.collisionCounter);
         System.out.println("AI " + aiColorString + ": " +"Time for this move: " + maxMoveTime);
         System.out.println("AI " + aiColorString + ": " +"Total time left: " + timeLeft);
         System.out.println(" ");
@@ -480,10 +478,93 @@ public class AI {
         //System.out.println(line);
     }
 
-    
+    private Move checkWinInOne(Board board){
+        //Get all the playable tiles and convert them to moves in a que
+        ArrayList<Tile> playableTiles = board.getPlayableTiles();
+
+        for(int i = 0; i < playableTiles.size(); i++){
+            int childMoveQ = playableTiles.get(i).q;
+            int childMoveR = playableTiles.get(i).r;
+            Move childMove = new Move(childMoveQ, childMoveR);
+
+            if(boardCheck.checkWin(childMoveQ, childMoveR, board) == aiColor){
+                //There is a win in one do it
+                return childMove;
+            }
+        }
+        return null;
+    }
+
+    private Move checkLoseInTwo(Board board){
+        //Get all the playable tiles and convert them to moves in a que
+        ArrayList<Tile> playableTiles = board.getPlayableTiles();
+
+        ArrayList<Move> lossInTwoMoves = new ArrayList<>();
+
+        //Move notLossInTwoMove = null;
+
+        boolean lossInTwo = false;
+
+        for(int i = 0; i < playableTiles.size(); i++){
+            int childMoveQ = playableTiles.get(i).q;
+            int childMoveR = playableTiles.get(i).r;
+            Move childMove = new Move(childMoveQ, childMoveR);
+
+            Board boardTmp = new Board(board);
+            //Do the move
+            int playerTurn = boardTmp.getPlayerTurn();
+            boardTmp.setTileState(childMoveQ, childMoveR, playerTurn);
+
+            ArrayList<Tile> playableTiles2 = board.getPlayableTiles();
+
+            for(int i2 = 0; i2 < playableTiles.size(); i2++){
+                int childMoveQ2 = playableTiles.get(i).q;
+                int childMoveR2 = playableTiles.get(i).r;
+
+                if(boardCheck.checkWin(childMoveQ2, childMoveR2, boardTmp) == -1*aiColor){
+                    //There is a loss in two
+                    return childMove;
+                }
+            }
+        }
+
+        /**if(lossInTwo) {
+            //Loss in two detected, see which move does not cause a loss in two
+            for (int i = 0; i < playableTiles.size(); i++) {
+                int childMoveQ = playableTiles.get(i).q;
+                int childMoveR = playableTiles.get(i).r;
+                Move childMove = new Move(childMoveQ, childMoveR);
+                if(!lossInTwoMoves.contains(childMove)){
+                    return childMove;
+                }
+            }
+        }**/
+
+        return null;
+    }
+
+
 
     public Move makeMove(Board board){
         this.board = board;
+
+        //Check for win in one
+        Move winInOneMove = checkWinInOne(board);
+        if(winInOneMove != null){
+            //There is a win in one, do it
+            System.out.println("AI " + aiColorString + ": " +"Go for win in one!");
+            System.out.println(" ");
+            return winInOneMove;
+        }
+
+        //Check for loss in two
+        Move blockLossInTwo = checkLoseInTwo(board);
+        if(blockLossInTwo != null){
+            //There is a loss in two, block it
+            System.out.println("AI " + aiColorString + ": " +"Block lose in two");
+            System.out.println(" ");
+            return blockLossInTwo;
+        }
 
         //Set the moveTime
         if(movesTaken < expectedAmountOfMoves){
@@ -492,6 +573,8 @@ public class AI {
             //Running out of time, take percentage of remaining
             maxMoveTime = ((double)timeLeft)*panicPercentage;
         }
+
+
 
         nodesVisited = 0;
 
@@ -516,6 +599,7 @@ public class AI {
 
         //Iterative deepening
         while(depth < maxDepth && !stopLoop){
+            //Iterate by two
             depth += 1;
             //System.out.println("AI " + aiColorString + ": " + "Depth: " + depth);
             int targetDepth = maxDepth;
@@ -604,7 +688,7 @@ public class AI {
 
         //Update the time left
         double timeElapsed = ((double)(System.currentTimeMillis() - startTime))/1000;
-        timeLeft = timeLeft - (int)timeElapsed;
+        timeLeft = timeLeft - timeElapsed;
 
         totalTestTime += (int)timeElapsed;
 

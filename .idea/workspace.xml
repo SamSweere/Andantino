@@ -7,10 +7,12 @@
       <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/AITest.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/AITest.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/Game.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/Game.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/SearchReturn.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/SearchReturn.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/TT.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/TT.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/game/AI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/AI.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/game/AITest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/AITest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/game/Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/Game.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/game/SearchReturn.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/SearchReturn.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/game/TT.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/TT.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -167,43 +169,53 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/game/AI.java</url>
-          <line>585</line>
+          <line>668</line>
           <option name="timeStamp" value="123" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/game/AI.java</url>
-          <line>579</line>
+          <line>662</line>
           <option name="timeStamp" value="124" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/game/AI.java</url>
-          <line>493</line>
-          <option name="timeStamp" value="149" />
+          <line>536</line>
+          <option name="timeStamp" value="157" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/game/AI.java</url>
-          <line>490</line>
-          <option name="timeStamp" value="150" />
+          <line>537</line>
+          <option name="timeStamp" value="158" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/game/AI.java</url>
-          <line>518</line>
-          <option name="timeStamp" value="151" />
+          <line>535</line>
+          <option name="timeStamp" value="160" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/game/AI.java</url>
-          <line>530</line>
-          <option name="timeStamp" value="152" />
+          <line>620</line>
+          <option name="timeStamp" value="169" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/game/AI.java</url>
-          <line>528</line>
-          <option name="timeStamp" value="153" />
+          <line>600</line>
+          <option name="timeStamp" value="170" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/game/AI.java</url>
-          <line>519</line>
-          <option name="timeStamp" value="155" />
+          <line>686</line>
+          <option name="timeStamp" value="171" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/game/AI.java</url>
+          <line>611</line>
+          <option name="timeStamp" value="172" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/game/AI.java</url>
+          <line>689</line>
+          <option name="timeStamp" value="173" />
         </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>

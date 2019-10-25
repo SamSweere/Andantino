@@ -1,5 +1,6 @@
 package game;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 //This class is used for the pv and other useful data for a search return
@@ -21,7 +22,10 @@ public class SearchReturn{
 
     public SearchReturn(SearchReturn sr){
         //Copy function
-        this.pv = sr.pv;
+        if(!sr.outOfTime){
+            this.pv = new ArrayList<>(sr.pv);
+        }
+
         this.value = sr.value;
         this.depth = sr.depth;
         this.outOfTime = sr.outOfTime;
