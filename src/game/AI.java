@@ -19,7 +19,7 @@ public class AI {
     public static final int WIN = 100;
 
     //TODO: make sure this is set correctly
-    private final int totalTime = 60*2;
+    private final int totalTime = 60;
     private double timeLeft = totalTime;
 
     private int expectedAmountOfMoves = 25;
@@ -256,7 +256,7 @@ public class AI {
             nodesVisited += 1;
 
             //Check if this board is in the tt
-            TT.TTElement ttElem = tt.checkTT(hash);
+            TTElement ttElem = tt.checkTT(hash);
             if(ttElem != null){
                 //Board is present in TT
                 if(depth <= ttElem.depth){
