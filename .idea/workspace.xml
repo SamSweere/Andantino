@@ -4,10 +4,7 @@
     <list default="true" id="c0ba9a8c-ef6c-47a6-85e7-de882d7f4474" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/AI.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/AI.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/Game$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/Game$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/Game.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/Game.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/game/AI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/AI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/game/Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/Game.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -165,18 +162,6 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/game/AI.java</url>
-          <line>507</line>
-          <option name="timeStamp" value="177" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/game/AI.java</url>
-          <line>473</line>
-          <option name="timeStamp" value="178" />
-        </line-breakpoint>
-      </breakpoints>
       <breakpoints-dialog>
         <breakpoints-dialog>
           <selected-grouping-rules>
