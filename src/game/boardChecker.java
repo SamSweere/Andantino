@@ -7,10 +7,6 @@ public class boardChecker {
     private int playerTurn;
     private Board board;
 
-    //public boardChecker(int boardRadius){
-    //    this.boardRadius = boardRadius;
-    //}
-
     private boolean checkWinRows(int lastMoveQ, int lastMoveR, int player){
 
         //int player = tiles[lastMoveQ][lastMoveR].state;
@@ -137,7 +133,7 @@ public class boardChecker {
         while(!st.empty()){
             Tile tile = (Tile)st.pop();
 
-            //This needs to be done such that we dont encapsulate an empty area
+            //This needs to be done such that we don't encapsulate an empty area
             if(tile.state == player*-1){
                 encounteredOtherPlayer = true;
             }
@@ -191,13 +187,9 @@ public class boardChecker {
     }
 
     private boolean checkWinEnclose(int lastMoveQ, int lastMoveR, int player) {
-        //We use a flood-fill to detect this, the flood-fill starts at an emtpy or at an opponent tile
+        //We use a flood-fill to detect this, the flood-fill starts at an empty or at an opponent tile
         //surrounding the new placed tile. If the flood-fill hits a wall it is impossible that it is encapsulated
         //thus stop and return false
-        //int player = tiles[lastMoveQ][lastMoveR].state;
-
-        //Point[] axialDirections =  {new Point(1,0), new Point(1,-1),new Point(0,-1),
-        //         new Point(-1,0),new Point(-1,+1),new Point(0,+1)};
 
         //Copy the board such that we can mark where we have been
         Board boardFF = new Board(board);
@@ -244,11 +236,13 @@ public class boardChecker {
 
 
     public int checkWin(int lastMoveQ, int lastMoveR, Board board){
+        //The function that checks if one of the win conditions hold, if so return the number of the player that won
+        // -1 if player 2 (black) won, 0 if nobody won and 1 if player 1 (white) won
         int player = board.getPlayerTurn();
         this.playerTurn = player;
         this.board = board;
         this.boardRadius = board.getBoardRadius();
-        //Check if the player put a move in a define losing position (previously found by the enclosement algorithm
+        //Check if the player put a move in a define losing position (previously found by the enclose algorithm)
         if(board.getTileState(lastMoveQ,lastMoveR) == playerTurn*-2){
             //The other player wins because they put their own in an enclosed area
             return player*-1;
@@ -268,59 +262,6 @@ public class boardChecker {
 
         //No win conditions met, thus nobody won
         return 0;
-    }
-
-
-    public boolean checkValidMove(int clickQ, int clickR, Board board, int moveNumber){
-        this.board = board;
-        this.boardRadius = board.getBoardRadius();
-        //Check if the location is on the board
-        if(clickQ + clickR < boardRadius || clickQ + clickR > 3*boardRadius || clickQ < 0 || clickR < 0
-                || clickQ > boardRadius*2 || clickR > boardRadius*2){
-            //Off the board
-            return false;
-        }
-
-        int playedNeighbors = 0;
-        //Check if tile not already taken
-        if(board.getTileState(clickQ,clickR) == -1 || board.getTileState(clickQ,clickR) == 1){
-            return false;
-        }
-
-        //Check all the tiles around the tile
-        for(int q = -1; q <= 1; q++){
-            for(int r = -1; r <= 1; r++){
-                int checkQ = clickQ + q;
-                int checkR = clickR + r;
-                if(checkQ + checkR < boardRadius || checkR + checkQ > 3*boardRadius || checkQ < 0 || checkR < 0
-                        || checkQ > boardRadius*2 || checkR > boardRadius*2){
-                    //Off the board, no neighbors
-                }
-                else if(Math.abs(q + r) > 1){
-                    //Not a neighbor
-                }
-                else{
-                    if(board.getTileState(checkQ,checkR) == -1 || board.getTileState(checkQ,checkR) == 1){
-                        //Something is played here
-                        playedNeighbors++;
-                    }
-                }
-            }
-        }
-
-        if(moveNumber == 1){
-            //this is the first move, 1 neighbor is allowed
-            if(playedNeighbors >= 1){
-                return true;
-            }
-        }
-        else if(playedNeighbors >= 2){
-            //It is a valid move
-            return true;
-        }
-        //Otherwise it is an invalid move
-        return false;
-
     }
 
 }

@@ -6,7 +6,7 @@ import static java.lang.Math.pow;
 public class TT {
     //q, r, s
     private final long[][][] zobrist;
-    private final int hashKeyBytes = 2;
+    private final int hashKeyBytes = 3;
     private final int hashKeyBits = hashKeyBytes*8;
     private TTElement[] tt;
     private long initHashKey;
@@ -74,8 +74,8 @@ public class TT {
                 //No collision, return the found element
 
                 //TODO:this disables the TT
-                return null;
-                //return contents;
+                //return null;
+                return contents;
             }
         }
     }
@@ -125,12 +125,12 @@ public class TT {
 
     public TT(int boardRadius){
         //Create the random values for every parameter
-        zobrist = new long[boardRadius*2+1][boardRadius*2+1][3];
+        zobrist = new long[boardRadius*2+1][boardRadius*2+1][5];
 
         //Fill them with random long values
         for(int q = 0; q < boardRadius*2+1; q++){
             for(int r = 0; r < boardRadius*2+1; r++){
-                for(int s = 0; s < 3; s++){
+                for(int s = 0; s < 5; s++){
                     zobrist[q][r][s] = ThreadLocalRandom.current().nextLong();
                 }
             }
@@ -152,6 +152,10 @@ public class TT {
                         hashKey ^= zobrist[q][r][1];
                     }else if(board.getTileState(q, r) == -1){
                         hashKey ^= zobrist[q][r][2];
+                    }else if(board.getTileState(q, r) == -2){
+                        hashKey ^= zobrist[q][r][3];
+                    }else if(board.getTileState(q, r) == 2){
+                        hashKey ^= zobrist[q][r][4];
                     }
                     else{
                         hashKey ^= zobrist[q][r][0];

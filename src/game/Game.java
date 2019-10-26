@@ -14,15 +14,10 @@ public class Game extends JPanel implements MouseListener {
     //Game mode 0: AI vs AI, 1: Player vs AI (player is white); 2: AI vs Player (player is black); 3: Player vs player
     private final int gameMode;
 
-    private boolean humanTurn;
-
     private boolean gameFinished = false;
 
     private AI ai;
-
     private Board board;
-
-    //private Tile[][] tiles = new Tile[boardRadius*2+1][boardRadius*2+1];
 
     private final boardChecker boardCheck = new boardChecker();
 
@@ -93,15 +88,10 @@ public class Game extends JPanel implements MouseListener {
                 repaint();
             }
         }).start();
-
-        //aiBlack.closeFile();
-        //aiWhite.closeFile();
     }
 
     private void playerVSaiGameAIMove(){
         //Update the ai board
-        //ai.updateBoard(board);
-
         Move aiMove = ai.makeMove(board);
 
         //Make the move on the board
@@ -117,8 +107,6 @@ public class Game extends JPanel implements MouseListener {
 
 
     public void drawHexGrid(Graphics g) {
-        //super.repaint();
-
         Graphics2D g2d = (Graphics2D) g;
 
         RenderingHints rh
@@ -205,7 +193,7 @@ public class Game extends JPanel implements MouseListener {
 
     public void undoLastMove(){
         //System.out.println(moveHistory.size() );
-        //This funtion goes back to the last player move, we have to jump over the ai moves
+        //This function goes back to the last player move, we have to jump over the ai moves
         //This function is disabled when playing AI vs AI (the game is deterministic anyways)
         if(gameMode == 0){
             return;
@@ -273,10 +261,7 @@ public class Game extends JPanel implements MouseListener {
         //add the move to the history
         addToHistory();
 
-        //Change the player turn
-        //playerTurn = playerTurn*-1;
-
-        //We did all the checks we can now draw it (this makes it more nice visually)
+        //We did all the checks we can now draw it (this makes it more visually nice)
         this.repaint();
 
         //When the tile is drawn show the possible win message
@@ -303,7 +288,7 @@ public class Game extends JPanel implements MouseListener {
                         System.out.println("Clicked tile: " + q + " " + r);
 
                         //Check if the move is valid
-                        if(boardCheck.checkValidMove(q,r, board, boardHistory.size())){
+                        if(board.checkValidMove(q,r, boardHistory.size())){
                             gameFinished = makeMove(new Move(q,r));
                             //Let a possible AI know it is his turn
                             if(gameMode == 1 || gameMode == 2){

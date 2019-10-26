@@ -72,10 +72,10 @@ public class Board {
                 int checkSurR = checkR + r;
                 if(checkSurQ + checkSurR < boardRadius || checkSurQ + checkSurR > 3*boardRadius || checkSurQ < 0 || checkSurR < 0
                         || checkSurQ > boardRadius*2 || checkSurR > boardRadius*2){
-                    //Off the board, no neighbors
+                    //Off the board, not a neighbour
                 }
                 else if(Math.abs(q + r) > 1){
-                    //Not a neighbor
+                    //Not a neighbour
                 }
                 else{
                     if(tiles[checkSurQ][checkSurR].state == -1 || tiles[checkSurQ][checkSurR].state == 1){
@@ -172,5 +172,56 @@ public class Board {
             }
         }
         return playableTiles;
+    }
+
+    public boolean checkValidMove(int clickQ, int clickR, int moveNumber){
+        //This function checks if the tile that the human clicked is a valid move
+
+        //Check if the location is on the board
+        if(clickQ + clickR < boardRadius || clickQ + clickR > 3*boardRadius || clickQ < 0 || clickR < 0
+                || clickQ > boardRadius*2 || clickR > boardRadius*2){
+            //Off the board
+            return false;
+        }
+
+        int playedNeighbors = 0;
+        //Check if tile not already taken
+        if(getTileState(clickQ,clickR) == -1 || getTileState(clickQ,clickR) == 1){
+            return false;
+        }
+
+        //Check all the tiles around the tile
+        for(int q = -1; q <= 1; q++){
+            for(int r = -1; r <= 1; r++){
+                int checkQ = clickQ + q;
+                int checkR = clickR + r;
+                if(checkQ + checkR < boardRadius || checkR + checkQ > 3*boardRadius || checkQ < 0 || checkR < 0
+                        || checkQ > boardRadius*2 || checkR > boardRadius*2){
+                    //Off the board, no neighbors
+                }
+                else if(Math.abs(q + r) > 1){
+                    //Not a neighbor
+                }
+                else{
+                    if(getTileState(checkQ,checkR) == -1 || getTileState(checkQ,checkR) == 1){
+                        //Something is played here
+                        playedNeighbors++;
+                    }
+                }
+            }
+        }
+
+        if(moveNumber == 1){
+            //this is the first move, 1 neighbor is allowed
+            if(playedNeighbors >= 1){
+                return true;
+            }
+        }
+        else if(playedNeighbors >= 2){
+            //It is a valid move
+            return true;
+        }
+        //Otherwise it is an invalid move
+        return false;
     }
 }

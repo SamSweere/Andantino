@@ -145,15 +145,6 @@ public class AI {
             }
         }
 
-
-        //Win == 100, lose == -100
-        // nextInt is normally exclusive of the top value,
-        // so add 1 to make it inclusive
-        //int randomNum = ThreadLocalRandom.current().nextInt(99, 99 + 1);
-
-        //TODO: turned of random eval
-        //return randomNum;
-
         int relativeDiference = (int)((((double)scoreWhite)/((double)(scoreWhite+scoreBlack))
                 - ((double)scoreBlack)/((double)(scoreWhite+scoreBlack)))*99);
         //System.out.println(relativeDiference);
@@ -161,7 +152,7 @@ public class AI {
         return relativeDiference;
     }
 
-    private int evaluateConnections(Board board, Move move){
+    private int evaluateNeighbours(Board board, Move move){
         //Make the move on this board
         int playerTurn = board.getPlayerTurn();
         board.setTileState(move.q, move.r, playerTurn);
@@ -219,7 +210,7 @@ public class AI {
 
     private int evaluate(Board board, Move move){
         //Score is always in favour of white and should be reversible (-1*score)
-        int evalScore = evaluateConnections(new Board(board),move);
+        int evalScore = evaluateNeighbours(new Board(board),move);
         return evalScore;
     }
 
@@ -423,7 +414,6 @@ public class AI {
         }
         //Store it in the tt
         if (pv != null) {
-            //TODO: check if the score is saved correctly
             tt.storeTT(hash,flag,score,depth, pv.getLastMove());
         }
         //TODO:log builder here
@@ -503,7 +493,7 @@ public class AI {
 
         //Move notLossInTwoMove = null;
 
-        boolean lossInTwo = false;
+        //boolean lossInTwo = false;
 
         for(int i = 0; i < playableTiles.size(); i++){
             int childMoveQ = playableTiles.get(i).q;
