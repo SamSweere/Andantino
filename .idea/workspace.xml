@@ -2,28 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c0ba9a8c-ef6c-47a6-85e7-de882d7f4474" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/andantino.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/andantino.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/module_andantino.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/Andantino/game/CheckWin.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Report/AdantinoAiUml.drawio" beforeDir="false" afterPath="$PROJECT_DIR$/Report/AdantinoAiUml.drawio" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Report/images/AdantinoAiUml.png" beforeDir="false" afterPath="$PROJECT_DIR$/Report/images/AdantinoAiUml.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/AI.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/AI.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/AITest.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/AITest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/Board.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/Board.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/Game$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/Game$1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/Game.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/Game.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/Move.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/Move.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/TT.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/TT.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/boardChecker.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/game/AI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/AI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/game/AITest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/AITest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/game/Board.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/Board.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/game/Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/Game.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/game/Move.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/Move.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/game/TT.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/TT.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/game/boardChecker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/CheckWin.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -184,12 +168,12 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/game/AI.java</url>
-          <line>509</line>
+          <line>507</line>
           <option name="timeStamp" value="177" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/game/AI.java</url>
-          <line>475</line>
+          <line>473</line>
           <option name="timeStamp" value="178" />
         </line-breakpoint>
       </breakpoints>

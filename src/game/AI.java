@@ -19,7 +19,7 @@ public class AI {
     public static final int WIN = 100;
 
     //TODO: make sure this is set correctly
-    private final int totalTime = 60*4;
+    private final int totalTime = 60;
     private double timeLeft = totalTime;
 
     private int expectedAmountOfMoves = 25;
@@ -438,12 +438,10 @@ public class AI {
     private void printInformation(Board board, SearchReturn pv, double timeLapsed){
         if(pv.value == WIN){
             //We won for sure
-            //TODO: this is not consistent, see the bug description in the report
             System.out.println("AI " + aiColorString + ": we will win in " + (pv.depth - 1) + " moves!!!");
         }
         else if(pv.value == -1*WIN){
             //We lost for sure
-            //TODO: this is not consistent, see the bug description in the report
             System.out.println("AI " + aiColorString + ": we will lose in at least " + (pv.depth-1) + " moves!!!");
         }
 
@@ -521,7 +519,7 @@ public class AI {
         this.board = boardC;
 
         System.out.println("AI " + aiColorString + ": playerturn " + board.getPlayerTurn());
-
+        /**
         //Check for win in one
         Move winInOneMove = checkWinInOne(board);
         if(winInOneMove != null){
@@ -529,8 +527,8 @@ public class AI {
             System.out.println("AI " + aiColorString + ": " +"Go for win in one!");
             System.out.println(" ");
             return winInOneMove;
-        }
-
+        }**/
+        /**
         //Check for loss in two
         Move blockLossInTwo = checkLoseInTwo(board);
         if(blockLossInTwo != null){
@@ -538,7 +536,7 @@ public class AI {
             System.out.println("AI " + aiColorString + ": " +"Block lose in two");
             System.out.println(" ");
             return blockLossInTwo;
-        }
+        }**/
 
         //Set the moveTime
         if(movesTaken < expectedAmountOfMoves){
@@ -587,6 +585,21 @@ public class AI {
                 //We are out of time, take the pv of one depth lower, thus do not update the pv
                 stopLoop = true;
                 System.out.println("AI " + aiColorString + ": " + "Out of time, play depth: " + (depth-1));
+            }else if(pvD.value == WIN){
+                pv = new SearchReturn(pvD);
+                //The search concluded in a definite win
+                //We won no need to search further
+                stopLoop = true;
+                System.out.println("AI " + aiColorString + ": " + "Stopping loop for win");
+            }else if(pvD.value == -1*WIN) {
+                //The program thinks that it has lost, go back to the depth where it didn't think it lost and play that move
+                //Thus do not update pv, but if the depth < 2, then do update the pv, otherwise it cant block
+                if (depth <= 2) {
+                    pv = new SearchReturn(pvD);
+                }
+                //pv = alphaBeta(new Board(board),1,alpha,beta, new Move(Integer.MAX_VALUE, Integer.MAX_VALUE), hash);
+                stopLoop = true;
+                System.out.println("AI " + aiColorString + ": " + "Detected loss, play on depth where loss was not yet detected");
             }
             else{
                 //This construction could trigger a null in pv when debugging
