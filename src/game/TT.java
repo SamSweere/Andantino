@@ -9,11 +9,7 @@ public class TT {
     private final int hashKeyBytes = 3;
     private final int hashKeyBits = hashKeyBytes*8;
     private TTElement[] tt;
-    private long initHashKey;
     public int collisionCounter = 0;
-
-
-
 
     //fast way to convert long to bytes and back
     public static byte[] longToBytes(long l) {
@@ -59,22 +55,19 @@ public class TT {
         //Check if it is present in the tt
         TTElement contents = tt[hashKey];
         if(contents == null){
-            //Element is empty, add it
-            //tt[hashKey] = new TTElement(primaryHash, value, depth);
-
-            //Not found in tt, return -1
+            //Not found in tt, return null
             return null;
         }else{
             //this hashKey is not emtpy, check for collision
             if(contents.primaryHash == primaryHash){
-                //Collision occured
+                //Collision occurred
                 return null;
             }
             else{
                 //No collision, return the found element
-
                 //TODO:this disables the TT
                 //return null;
+
                 return contents;
             }
         }
@@ -112,8 +105,8 @@ public class TT {
         }else{
             //this hashKey is not emtpy, check for collision
             if(contents.primaryHash == primaryHash){
-                //Collision occured
-                //TODO: replacement strategy is here new, therefore do not return this value
+                //Collision occurred
+                //Replacement strategy is here new, therefore do not return this value
                 collisionCounter += 1;
                 tt[hashKey] = ttElem;
             }
@@ -168,9 +161,9 @@ public class TT {
     }
 
     public long updateHash(long hashKey, Move move, int player) {
-        //Make sure the playernumber is converted to the array acces value
+        //Make sure the playernumber is converted to the array access value
         int playerNum = 0;
-        if(player == 0){
+        if(player == 1){
             playerNum = 1;
         }
         else if(player == -1){

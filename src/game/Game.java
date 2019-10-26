@@ -19,7 +19,7 @@ public class Game extends JPanel implements MouseListener {
     private AI ai;
     private Board board;
 
-    private final boardChecker boardCheck = new boardChecker();
+    //private final boardChecker boardCheck = new boardChecker();
 
     //The reason I save every board for the history is the instant lose positions, these got overwritten when only
     //saving the moves when undoing and keep playing
@@ -65,9 +65,10 @@ public class Game extends JPanel implements MouseListener {
     }
 
     private void aiVSaiGame(){
-        AI aiWhite = new AI(-1, boardRadius);
-        //AITest aiBlack = new AITest(1, boardRadius);
-        AI aiBlack = new AI(1, boardRadius);
+        //Names and the numbers must align! You cannot switch the names and playernumbers
+        AI aiWhite = new AI(1, boardRadius);
+        //AITest aiBlack = new AITest(-1, boardRadius);
+        AI aiBlack = new AI(-1, boardRadius);
 
         //Roughly 30 fps
         int timerDelay = 33;
@@ -77,11 +78,11 @@ public class Game extends JPanel implements MouseListener {
                 if(!gameFinished){
                     if(board.getPlayerTurn() == 1){
                         //aiWhite.updateBoard(board);
-                        Move aiMove = aiWhite.makeMove(board);
+                        Move aiMove = aiWhite.makeMove(new Board(board));
                         gameFinished = makeMove(aiMove);
                     }else{
                         //aiBlack.updateBoard(board);
-                        Move aiMove  = aiBlack.makeMove(board);
+                        Move aiMove  = aiBlack.makeMove(new Board(board));
                         gameFinished = makeMove(aiMove);
                     }
                 }
@@ -92,7 +93,7 @@ public class Game extends JPanel implements MouseListener {
 
     private void playerVSaiGameAIMove(){
         //Update the ai board
-        Move aiMove = ai.makeMove(board);
+        Move aiMove = ai.makeMove(new Board(board));
 
         //Make the move on the board
         gameFinished = makeMove(aiMove);
@@ -254,9 +255,9 @@ public class Game extends JPanel implements MouseListener {
     }
 
     private boolean makeMove(Move move){
-        int winningPlayer = boardCheck.checkWin(move.q, move.r, board);
+        int winningPlayer = board.checkWin(move.q, move.r);
 
-        board.setTileState(move.q, move.r,board.getPlayerTurn());
+        board.setTileState(move.q, move.r, board.getPlayerTurn());
 
         //add the move to the history
         addToHistory();

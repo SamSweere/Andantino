@@ -1,12 +1,17 @@
 package game;
 
 public class Move {
-    public final int q;
-    public final int r;
+    public final byte q;
+    public final byte r;
 
     public Move(int q, int r){
-        this.q = q;
-        this.r = r;
+        this.q = (byte)q;
+        this.r = (byte)r;
+    }
+
+    public Move(Move move){
+        this.q = move.q;
+        this.r = move.r;
     }
 
     public boolean equals(Move move){

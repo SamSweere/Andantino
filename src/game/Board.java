@@ -224,4 +224,11 @@ public class Board {
         //Otherwise it is an invalid move
         return false;
     }
+
+    public int checkWin(int moveQ, int moveR){
+        CheckWin winChecker = new CheckWin();
+        int winScore = winChecker.checkWin(moveQ, moveR, this);
+        return winScore;
+    }
+
 }

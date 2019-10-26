@@ -2,7 +2,7 @@ package game;
 
 import java.util.Stack;
 
-public class boardChecker {
+public class CheckWin {
     private int boardRadius;
     private int playerTurn;
     private Board board;
@@ -235,13 +235,13 @@ public class boardChecker {
     }
 
 
-    public int checkWin(int lastMoveQ, int lastMoveR, Board board){
+    public int checkWin(int lastMoveQ, int lastMoveR, Board boardC){
+        this.board = new Board(boardC);
+        this.playerTurn = board.getPlayerTurn();
+        this.boardRadius = board.getBoardRadius();
         //The function that checks if one of the win conditions hold, if so return the number of the player that won
         // -1 if player 2 (black) won, 0 if nobody won and 1 if player 1 (white) won
         int player = board.getPlayerTurn();
-        this.playerTurn = player;
-        this.board = board;
-        this.boardRadius = board.getBoardRadius();
         //Check if the player put a move in a define losing position (previously found by the enclose algorithm)
         if(board.getTileState(lastMoveQ,lastMoveR) == playerTurn*-2){
             //The other player wins because they put their own in an enclosed area

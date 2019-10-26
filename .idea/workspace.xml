@@ -2,22 +2,28 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c0ba9a8c-ef6c-47a6-85e7-de882d7f4474" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/andantino.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/andantino.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/module_andantino.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/Andantino/game/CheckWin.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Report/AdantinoAiUml.drawio" beforeDir="false" afterPath="$PROJECT_DIR$/Report/AdantinoAiUml.drawio" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Report/images/axial-System.png" beforeDir="false" afterPath="$PROJECT_DIR$/Report/images/axial-System.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Report/images/board.png" beforeDir="false" afterPath="$PROJECT_DIR$/Report/images/board.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Report/images/AdantinoAiUml.png" beforeDir="false" afterPath="$PROJECT_DIR$/Report/images/AdantinoAiUml.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/AI.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/AI.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/AITest.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/AITest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/Board.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/Board.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/Game$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/Game$1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/Game.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/Game.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/Move.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/Move.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/TT.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/TT.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/TTElement.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Andantino/game/TTElement.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Andantino/game/boardChecker.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/game/AI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/AI.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/game/AITest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/AITest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/game/Board.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/Board.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/game/Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/Game.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/game/Move.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/Move.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/game/TT.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/TT.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/game/TTElement.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/TTElement.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/game/boardChecker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/boardChecker.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/game/boardChecker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/CheckWin.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -44,6 +50,10 @@
   </component>
   <component name="PropertiesComponent">
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
+    <property name="GenerateAntBuildDialog.backupFiles" value="true" />
+    <property name="GenerateAntBuildDialog.enableUiFormCompile" value="true" />
+    <property name="GenerateAntBuildDialog.forceTargetJdk" value="true" />
+    <property name="GenerateAntBuildDialog.outputFileNameProperty" value="andantino" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="project.structure.last.edited" value="Project" />
     <property name="project.structure.proportion" value="0.0" />
@@ -173,9 +183,14 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/game/boardChecker.java</url>
-          <line>245</line>
-          <option name="timeStamp" value="174" />
+          <url>file://$PROJECT_DIR$/src/game/AI.java</url>
+          <line>509</line>
+          <option name="timeStamp" value="177" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/game/AI.java</url>
+          <line>475</line>
+          <option name="timeStamp" value="178" />
         </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
