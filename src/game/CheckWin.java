@@ -235,8 +235,8 @@ public class CheckWin {
     }
 
 
-    public int checkWin(int lastMoveQ, int lastMoveR, Board boardC){
-        this.board = new Board(boardC);
+    public int checkWin(int lastMoveQ, int lastMoveR, Board board){
+        this.board = board;
         this.playerTurn = board.getPlayerTurn();
         this.boardRadius = board.getBoardRadius();
         //The function that checks if one of the win conditions hold, if so return the number of the player that won
