@@ -6,7 +6,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import static java.lang.Integer.*;
 
 public class AI {
-    private String aiName = "finalVersion_NeighboursEval_vsGroupsizeEval";
+    private String aiName = "finalVersion_NeighboursEval_vsNeighboursEval";
     private Board board;
     private final int aiColor;
     private int nodesVisited;

@@ -190,8 +190,9 @@ To test which evaluation function performs best I first let the AI with no evalu
 
 TODO: AI no Evaluation function vs AI groupsize evaluation function
 
-The AI with the groupsize evaluation function won both games from the AI with no evaluation function. 
-
+The AI with the groupsize evaluation function won both games from the AI with no evaluation function. If we look at the progression of the game we see that sometimes the AI only went to depth 2 in a short amount of time. This is because it has detected a possible loss in two and immediately tries to block it. When in other cases the AI does not take the full 20 seconds of time it is because either it has detected that it will win, or it has detected that it will lose and play the best move from the depth where he did not yet detect this. We can also observe that the AI with no evaluation function can explore around 80000 nodes in 20 second (4000 nodes per second), but the AI with the group evaluation function is able to explore 50000 nodes (2500 nodes per second) in the beginning but after a few moves is only able to explore around 20000 moves (1000 nodes per second). This can be explained by that the flood fill in the groupsize evaluation function will take longer when more tiles are played. Since the AI with no evaluation function can explore more nodes it is able to search deeper, averaging at a search depth of 9. While the AI with the groupsize evaluation method averages at a search depth of 6. Despite this it is still able to beat the AI with no evaluation function as both colours, showing the importance of a good evaluation funtion.
+\\
+\\
 Next we test if an AI with the neighbours evaluation function will beat an AI with the groupsize evaluation function.
 
 TODO: 
