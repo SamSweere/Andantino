@@ -6,10 +6,9 @@ import java.util.concurrent.ThreadLocalRandom;
 import static java.lang.Integer.*;
 
 public class AITest {
-    private String aiName = "testing";
+    private String aiName = "finalVersion_groupsizeEval_vsNeighboursEval";
     private Board board;
     private final int aiColor;
-    //private final boardChecker boardCheck = new boardChecker();
     private int nodesVisited;
     private fileWriter fw;
 
@@ -19,27 +18,22 @@ public class AITest {
     public static final int WIN = 100;
 
     //TODO: make sure this is set correctly
-    private final int totalTime = 60;
+    private final int totalTime = 60*10;
     private double timeLeft = totalTime;
 
     private int expectedAmountOfMoves = 25;
     private double takeYourTimePerc = 0.8;
     private double panicPercentage = 0.08;
     private int movesTaken = 0;
-    private double maxMoveTime;
-
-
-
-    private final int maxTestTime = 60;
+    //TODO: change this for the final version back to nothing
+    private double maxMoveTime = 20;
 
     //Max depth
-    private final int maxDepth = 12;
+    private final int maxDepth = 20;
     private final int boardRadius;
 
     private String log = "";
 
-
-    private int totalTestTime = 0;
     private TT tt;
     private long startTime;
 
@@ -206,7 +200,7 @@ public class AITest {
 
     private int evaluate(Board board, Move move){
         //Score is always in favour of white and should be reversible (-1*score)
-        int evalScore = evaluateNeighbours(new Board(board),move);
+        int evalScore = evaluateGroupsize(new Board(board),move);
         return evalScore;
     }
 
@@ -438,12 +432,10 @@ public class AITest {
     private void printInformation(Board board, SearchReturn pv, double timeLapsed){
         if(pv.value == WIN){
             //We won for sure
-            //TODO: this is not consistent, see the bug description in the report
             System.out.println("AI " + aiColorString + ": we will win in " + (pv.depth - 1) + " moves!!!");
         }
         else if(pv.value == -1*WIN){
             //We lost for sure
-            //TODO: this is not consistent, see the bug description in the report
             System.out.println("AI " + aiColorString + ": we will lose in at least " + (pv.depth-1) + " moves!!!");
         }
 
@@ -470,9 +462,11 @@ public class AITest {
             int childMoveR = playableTiles.get(i).r;
             Move childMove = new Move(childMoveQ, childMoveR);
 
+            //Update the node counter
+            nodesVisited += 1;
+
             if(board.checkWin(childMoveQ, childMoveR) == aiColor){
                 //There is a win in one do it
-                System.out.println("AI " + aiColorString + ": executing win in one!!!!!!");
                 return childMove;
             }
         }
@@ -484,19 +478,17 @@ public class AITest {
         //Get all the playable tiles and convert them to moves in a que
         ArrayList<Tile> playableTiles = board.getPlayableTiles();
 
-        int counter = 0;
-
         for(int i = 0; i < playableTiles.size(); i++){
             int childMoveQ = playableTiles.get(i).q;
             int childMoveR = playableTiles.get(i).r;
-            Move childMove = new Move(childMoveQ, childMoveR);
 
             Board boardTmp = new Board(board);
             //Do the move
             int playerTurn = boardTmp.getPlayerTurn();
             boardTmp.setTileState(childMoveQ, childMoveR, playerTurn);
 
-            counter += 1;
+            //Update the node counter
+            nodesVisited += 1;
 
 
             for(int i2 = 0; i2 < playableTiles.size(); i2++){
@@ -504,15 +496,15 @@ public class AITest {
                 int childMoveR2 = playableTiles.get(i).r;
                 Move childMove2 = new Move(childMoveQ2, childMoveR2);
 
+                //Update the node counter
+                nodesVisited += 1;
+
                 if(boardTmp.checkWin(childMoveQ2, childMoveR2) == -1*aiColor){
                     //There is a loss in two, play on the location of the loss in two
-                    System.out.println("AI " + aiColorString + ": stopping in two!!!!!!");
                     return childMove2;
                 }
             }
         }
-
-        System.out.println("AI " + aiColorString + ": checking in two possible nodes: " + counter);
 
         return null;
     }
@@ -520,14 +512,20 @@ public class AITest {
     public Move makeMove(Board board){
         this.board = board;
 
+        //Mark the time as the start of searching
+        startTime = System.currentTimeMillis();
+
+        //Reset the node counter
+        nodesVisited = 0;
+
         //Check for win in one
-        Move winInOneMove = checkWinInOne(board);
-        if(winInOneMove != null){
-            //There is a win in one, do it
-            System.out.println("AI " + aiColorString + ": " +"Go for win in one!");
-            System.out.println(" ");
-            return winInOneMove;
-        }
+        /**Move winInOneMove = checkWinInOne(board);
+         if(winInOneMove != null){
+         //There is a win in one, do it
+         System.out.println("AI " + aiColorString + ": " +"Go for win in one!");
+         System.out.println(" ");
+         return winInOneMove;
+         }**/
 
         //Check for loss in two
         Move blockLossInTwo = checkLoseInTwo(board);
@@ -535,24 +533,29 @@ public class AITest {
             //There is a loss in two, block it
             System.out.println("AI " + aiColorString + ": " +"Block lose in two");
             System.out.println(" ");
+
+            //Update the time left
+            double timeElapsed = ((double)(System.currentTimeMillis() - startTime))/1000;
+            timeLeft = timeLeft - timeElapsed;
+
+            //Since it is a block in two it only had to go to depth 2
+            fw.writeLine(2,timeElapsed,nodesVisited);
+
             return blockLossInTwo;
         }
 
+        //TODO: enable this back for the final version
         //Set the moveTime
-        if(movesTaken < expectedAmountOfMoves){
-            maxMoveTime = (((double)totalTime)*takeYourTimePerc)/((double)expectedAmountOfMoves);
-        }else{
-            //Running out of time, take percentage of remaining
-            maxMoveTime = ((double)timeLeft)*panicPercentage;
-        }
-
-        //Reset the node counter
-        nodesVisited = 0;
+        /**if(movesTaken < expectedAmountOfMoves){
+         maxMoveTime = (((double)totalTime)*takeYourTimePerc)/((double)expectedAmountOfMoves);
+         }else{
+         //Running out of time, take percentage of remaining
+         maxMoveTime = ((double)timeLeft)*panicPercentage;
+         }**/
 
         //Apply window of win lose + maxDepth
         int alpha = -1*WIN;
         int beta = WIN;
-
 
         //initial depth
         int depth = 0;
@@ -562,8 +565,6 @@ public class AITest {
 
         //Get the hash of the current board
         long hash = tt.getHash(board);
-
-        startTime = System.currentTimeMillis();
 
         //This is for out of time, forced moves or definite wins
         boolean stopLoop = false;
@@ -585,6 +586,21 @@ public class AITest {
                 //We are out of time, take the pv of one depth lower, thus do not update the pv
                 stopLoop = true;
                 System.out.println("AI " + aiColorString + ": " + "Out of time, play depth: " + (depth-1));
+            }else if(pvD.value == WIN){
+                pv = new SearchReturn(pvD);
+                //The search concluded in a definite win
+                //We won no need to search further
+                stopLoop = true;
+                System.out.println("AI " + aiColorString + ": " + "Stopping loop for win");
+            }else if(pvD.value == -1*WIN) {
+                //The program thinks that it has lost, go back to the depth where it didn't think it lost and play that move
+                //Thus do not update pv, but if the depth < 2, then do update the pv, otherwise it cant block
+                if (depth <= 2) {
+                    pv = new SearchReturn(pvD);
+                }
+                //pv = alphaBeta(new Board(board),1,alpha,beta, new Move(Integer.MAX_VALUE, Integer.MAX_VALUE), hash);
+                stopLoop = true;
+                System.out.println("AI " + aiColorString + ": " + "Detected loss, play on depth where loss was not yet detected");
             }
             else{
                 //This construction could trigger a null in pv when debugging
@@ -601,13 +617,7 @@ public class AITest {
         double timeElapsed = ((double)(System.currentTimeMillis() - startTime))/1000;
         timeLeft = timeLeft - timeElapsed;
 
-        totalTestTime += (int)timeElapsed;
-
-        /**if(totalTestTime > maxTestTime){
-         System.out.println("AI " + aiColorString + ": " + "Test complete, you can stop");
-         }else{
-         fw.writeLine(depth,timeElapsed,nodesVisited);
-         }**/
+        fw.writeLine(depth,timeElapsed,nodesVisited);
 
         //Print the information about the search
         printInformation(new Board(board), pv, timeElapsed);
@@ -618,54 +628,3 @@ public class AITest {
         return move;
     }
 }
-
-//Code that should work if the bug is found:
-/**else if(pvD.value == WIN){
- pv = new SearchReturn(pvD);
- //We won no need to search further
- stopLoop = true;
- System.out.println("AI " + aiColorString + ": " + "Stopping loop for win");
- }**/
-/**else if(pvD.value == -1*WIN) {
- //The program thinks that it has lost, go back to the depth where it didnt think it lost and play that move
- //Thus do not update pv, but if the depth < 2, then do update the pv, otherwise it cant block
- if (depth <= 2) {
- pv = new SearchReturn(pvD);
- }
- //pv = alphaBeta(new Board(board),1,alpha,beta, new Move(Integer.MAX_VALUE, Integer.MAX_VALUE), hash);
- stopLoop = true;
- System.out.println("AI " + aiColorString + ": " + "Detected loss, play on depth where loss was not yet detected");
- }**/
-
-/**
- //For the intial move make a move with max values (impossible to do)
- //Save the pv on this depth (for instant win or loss cases)
- SearchReturn pvD = alphaBeta(new Board(board),depth,alpha,beta, new Move(Integer.MAX_VALUE, Integer.MAX_VALUE), hash);
-
- //Check for out of time
- if(pvD.outOfTime){
- //We are out of time, take the pv of one depth lower, thus do not update the pv
- stopLoop = true;
- System.out.println("AI " + aiColorString + ": " + "Out of time, play depth: " + (depth-1));
- }
- else if(pvD.value == WIN){
- pv = pvD;
- //We won no need to search further
- stopLoop = true;
- System.out.println("AI " + aiColorString + ": " + "Stopping loop for win");
- }
- else if(pvD.value == -1*WIN){
- double timeElapsed = ((double)(System.currentTimeMillis() - startTime))/1000;
- printInformation(pvD, timeElapsed);
- //The program thinks that it has lost, go back to the depth where it didnt think it lost and play that move
- //Thus do not update pv, but if the depth < 2, then do update the pv, otherwise it cant block
- if(depth <= 2){
- pv = pvD;
- }
- //pv = alphaBeta(new Board(board),1,alpha,beta, new Move(Integer.MAX_VALUE, Integer.MAX_VALUE), hash);
- stopLoop = true;
- System.out.println("AI " + aiColorString + ": " + "Detected loss, play on depth where loss was not yet detected");
- }else{
- //Update the pv
- pv = pvD;
- }**/

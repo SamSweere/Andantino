@@ -36,7 +36,7 @@ public class fileWriter {
         }
     }
 
-    public void writeLine(int depth, float time, int nodes) {
+    public void writeLine(int depth, double time, int nodes) {
         BufferedReader br = null;
         try {
             br = new BufferedReader(new FileReader(filePath));

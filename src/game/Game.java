@@ -68,7 +68,7 @@ public class Game extends JPanel implements MouseListener {
         //Names and the numbers must align! You cannot switch the names and playernumbers
         AI aiWhite = new AI(1, boardRadius);
         //AITest aiBlack = new AITest(-1, boardRadius);
-        AI aiBlack = new AI(-1, boardRadius);
+        AITest aiBlack = new AITest(-1, boardRadius);
 
         //Roughly 30 fps
         int timerDelay = 33;

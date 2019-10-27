@@ -6,10 +6,9 @@ import java.util.concurrent.ThreadLocalRandom;
 import static java.lang.Integer.*;
 
 public class AI {
-    private String aiName = "testing";
+    private String aiName = "finalVersion_NeighboursEval_vsGroupsizeEval";
     private Board board;
     private final int aiColor;
-    //private final boardChecker boardCheck = new boardChecker();
     private int nodesVisited;
     private fileWriter fw;
 
@@ -26,20 +25,15 @@ public class AI {
     private double takeYourTimePerc = 0.8;
     private double panicPercentage = 0.08;
     private int movesTaken = 0;
-    private double maxMoveTime;
-
-
-
-    private final int maxTestTime = 60;
+    //TODO: change this for the final version back to nothing
+    private double maxMoveTime = 20;
 
     //Max depth
-    private final int maxDepth = 12;
+    private final int maxDepth = 20;
     private final int boardRadius;
 
     private String log = "";
 
-
-    private int totalTestTime = 0;
     private TT tt;
     private long startTime;
 
@@ -458,6 +452,27 @@ public class AI {
         tt.collisionCounter = 0;
     }
 
+    private Move checkWinInOne(Board board){
+        //This function checks for a win in one
+        //Get all the playable tiles and convert them to moves in a que
+        ArrayList<Tile> playableTiles = board.getPlayableTiles();
+
+        for(int i = 0; i < playableTiles.size(); i++){
+            int childMoveQ = playableTiles.get(i).q;
+            int childMoveR = playableTiles.get(i).r;
+            Move childMove = new Move(childMoveQ, childMoveR);
+
+            //Update the node counter
+            nodesVisited += 1;
+
+            if(board.checkWin(childMoveQ, childMoveR) == aiColor){
+                //There is a win in one do it
+                return childMove;
+            }
+        }
+        return null;
+    }
+
     private Move checkLoseInTwo(Board board){
         //This function checks for a loss in two by just search to depth 2
         //Get all the playable tiles and convert them to moves in a que
@@ -472,11 +487,17 @@ public class AI {
             int playerTurn = boardTmp.getPlayerTurn();
             boardTmp.setTileState(childMoveQ, childMoveR, playerTurn);
 
+            //Update the node counter
+            nodesVisited += 1;
+
 
             for(int i2 = 0; i2 < playableTiles.size(); i2++){
                 int childMoveQ2 = playableTiles.get(i).q;
                 int childMoveR2 = playableTiles.get(i).r;
                 Move childMove2 = new Move(childMoveQ2, childMoveR2);
+
+                //Update the node counter
+                nodesVisited += 1;
 
                 if(boardTmp.checkWin(childMoveQ2, childMoveR2) == -1*aiColor){
                     //There is a loss in two, play on the location of the loss in two
@@ -491,30 +512,50 @@ public class AI {
     public Move makeMove(Board board){
         this.board = board;
 
+        //Mark the time as the start of searching
+        startTime = System.currentTimeMillis();
+
+        //Reset the node counter
+        nodesVisited = 0;
+
+        //Check for win in one
+        /**Move winInOneMove = checkWinInOne(board);
+        if(winInOneMove != null){
+            //There is a win in one, do it
+            System.out.println("AI " + aiColorString + ": " +"Go for win in one!");
+            System.out.println(" ");
+            return winInOneMove;
+        }**/
+
         //Check for loss in two
         Move blockLossInTwo = checkLoseInTwo(board);
         if(blockLossInTwo != null){
             //There is a loss in two, block it
             System.out.println("AI " + aiColorString + ": " +"Block lose in two");
             System.out.println(" ");
+
+            //Update the time left
+            double timeElapsed = ((double)(System.currentTimeMillis() - startTime))/1000;
+            timeLeft = timeLeft - timeElapsed;
+
+            //Since it is a block in two it only had to go to depth 2
+            fw.writeLine(2,timeElapsed,nodesVisited);
+
             return blockLossInTwo;
         }
 
+        //TODO: enable this back for the final version
         //Set the moveTime
-        if(movesTaken < expectedAmountOfMoves){
+        /**if(movesTaken < expectedAmountOfMoves){
             maxMoveTime = (((double)totalTime)*takeYourTimePerc)/((double)expectedAmountOfMoves);
         }else{
             //Running out of time, take percentage of remaining
             maxMoveTime = ((double)timeLeft)*panicPercentage;
-        }
-
-        //Reset the node counter
-        nodesVisited = 0;
+        }**/
 
         //Apply window of win lose + maxDepth
         int alpha = -1*WIN;
         int beta = WIN;
-
 
         //initial depth
         int depth = 0;
@@ -524,8 +565,6 @@ public class AI {
 
         //Get the hash of the current board
         long hash = tt.getHash(board);
-
-        startTime = System.currentTimeMillis();
 
         //This is for out of time, forced moves or definite wins
         boolean stopLoop = false;
@@ -578,13 +617,7 @@ public class AI {
         double timeElapsed = ((double)(System.currentTimeMillis() - startTime))/1000;
         timeLeft = timeLeft - timeElapsed;
 
-        totalTestTime += (int)timeElapsed;
-
-        /**if(totalTestTime > maxTestTime){
-            System.out.println("AI " + aiColorString + ": " + "Test complete, you can stop");
-        }else{
-            fw.writeLine(depth,timeElapsed,nodesVisited);
-        }**/
+        fw.writeLine(depth,timeElapsed,nodesVisited);
 
         //Print the information about the search
         printInformation(new Board(board), pv, timeElapsed);
