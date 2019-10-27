@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_andantino" default="compile.module.andantino">
+  <dirname property="module.andantino.basedir" file="${ant.file.module_andantino}"/>
+  
+  <property name="module.jdk.home.andantino" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.andantino" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.andantino" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.andantino" value="-encoding UTF-8 -source 11 -target 11 ${compiler.args}"/>
+  
+  <property name="andantino.output.dir" value="${module.andantino.basedir}/out/production/Andantino"/>
+  <property name="andantino.testoutput.dir" value="${module.andantino.basedir}/out/test/Andantino"/>
+  
+  <path id="andantino.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="andantino.module.production.classpath">
+    <path refid="${module.jdk.classpath.andantino}"/>
+  </path>
+  
+  <path id="andantino.runtime.production.module.classpath">
+    <pathelement location="${andantino.output.dir}"/>
+  </path>
+  
+  <path id="andantino.module.classpath">
+    <path refid="${module.jdk.classpath.andantino}"/>
+    <pathelement location="${andantino.output.dir}"/>
+  </path>
+  
+  <path id="andantino.runtime.module.classpath">
+    <pathelement location="${andantino.testoutput.dir}"/>
+    <pathelement location="${andantino.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.andantino">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.andantino">
+    <patternset refid="excluded.from.module.andantino"/>
+  </patternset>
+  
+  <path id="andantino.module.sourcepath">
+    <dirset dir="${module.andantino.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.andantino" depends="compile.module.andantino.production,compile.module.andantino.tests" description="Compile module Andantino"/>
+  
+  <target name="compile.module.andantino.production" depends="register.custom.compilers" description="Compile module Andantino; production classes">
+    <mkdir dir="${andantino.output.dir}"/>
+    <javac2 destdir="${andantino.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.andantino}/javac">
+      <compilerarg line="${compiler.args.andantino}"/>
+      <bootclasspath refid="andantino.module.bootclasspath"/>
+      <classpath refid="andantino.module.production.classpath"/>
+      <src refid="andantino.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.andantino"/>
+    </javac2>
+    
+    <copy todir="${andantino.output.dir}">
+      <fileset dir="${module.andantino.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.andantino.tests" depends="register.custom.compilers,compile.module.andantino.production" description="compile module Andantino; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.andantino" description="cleanup module">
+    <delete dir="${andantino.output.dir}"/>
+    <delete dir="${andantino.testoutput.dir}"/>
+  </target>
+</project>
