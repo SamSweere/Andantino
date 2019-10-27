@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Andantino:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Andantino_jar</output-path>
+    <root id="archive" name="Andantino.jar">
+      <element id="module-output" name="Andantino" />
+    </root>
+  </artifact>
+</component>
